@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { authRoutes } from "./auth.routes";
+import { clientRoutes } from "./client.routes";
 import { authenticate } from "../middlewares/auth";
 
 export default async function appRoutes(app: FastifyInstance) {
@@ -18,9 +19,6 @@ export default async function appRoutes(app: FastifyInstance) {
   app.register(async function (protectedRoutes) {
     protectedRoutes.addHook("onRequest", authenticate);
 
-    // protectedRoutes.register(userRoutes, { prefix: "/users" });
-    // protectedRoutes.register(storeRoutes, { prefix: "/stores" });
-    // protectedRoutes.register(clientRoutes, { prefix: "/clients" });
-    // protectedRoutes.register(saleRoutes, { prefix: "/sales" });
+    protectedRoutes.register(clientRoutes, { prefix: "/clients" });
   });
 }
