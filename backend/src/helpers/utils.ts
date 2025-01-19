@@ -26,6 +26,7 @@ export const comparePassword = async (
 };
 
 interface TokenPayload {
+  storeId: number;
   id: number;
   role: string;
   [key: string]: any;
