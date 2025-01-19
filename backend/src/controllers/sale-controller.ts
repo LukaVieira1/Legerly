@@ -26,26 +26,41 @@ export class SaleController {
         return reply.status(404).send({ message: "Client not found" });
       }
 
-      const sale = await prisma.sale.create({
-        data: {
-          value: saleData.value,
-          description: saleData.description,
-          isPaid: saleData.isPaid,
-          dueDate: saleData.dueDate,
-          storeId,
-          clientId: saleData.clientId,
-          userId,
-        },
-        include: {
-          client: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
+      const sale = await prisma.$transaction(async (tx) => {
+        const sale = await tx.sale.create({
+          data: {
+            value: saleData.value,
+            description: saleData.description,
+            isPaid: saleData.isPaid,
+            dueDate: saleData.dueDate,
+            storeId,
+            clientId: saleData.clientId,
+            userId,
+          },
+          include: {
+            client: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
             },
           },
-        },
+        });
+
+        if (!saleData.isPaid) {
+          await tx.client.update({
+            where: { id: saleData.clientId },
+            data: {
+              debitBalance: {
+                increment: saleData.value,
+              },
+            },
+          });
+        }
+
+        return sale;
       });
 
       return sale;
