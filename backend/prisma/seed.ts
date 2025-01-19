@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "../src/helpers/utils";
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -17,7 +19,7 @@ async function main() {
       data: {
         name: "Store Owner",
         email: "owner@example.com",
-        password: "owner123",
+        password: await hashPassword("owner123"),
       },
     }),
     // Manager user
@@ -25,7 +27,7 @@ async function main() {
       data: {
         name: "Store Manager",
         email: "manager@example.com",
-        password: "manager123",
+        password: await hashPassword("manager123"),
       },
     }),
     // Employee user
@@ -33,7 +35,7 @@ async function main() {
       data: {
         name: "Store Employee",
         email: "employee@example.com",
-        password: "employee123",
+        password: await hashPassword("employee123"),
       },
     }),
   ]);
