@@ -1,6 +1,5 @@
 FROM node:18-alpine
 
-
 # Install necessary dependencies
 RUN apk add --no-cache openssl libc6-compat netcat-openbsd
 
@@ -26,7 +25,6 @@ RUN mkdir -p prisma/migrations && chmod -R 777 prisma/migrations
 
 # Install dependencies
 RUN yarn install
-RUN yarn add --dev @types/node
 
 # Copy remaining files
 COPY . .
