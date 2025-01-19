@@ -77,6 +77,7 @@ async function main() {
         birthDate: new Date("1990-01-01"),
         observations: "Regular customer",
         storeId: store.id,
+        debitBalance: 150,
       },
     }),
     prisma.client.create({
@@ -86,6 +87,7 @@ async function main() {
         birthDate: new Date("1985-05-15"),
         observations: "Prefers evening appointments",
         storeId: store.id,
+        debitBalance: 0,
       },
     }),
   ]);
@@ -94,7 +96,7 @@ async function main() {
   const sale1 = await prisma.sale.create({
     data: {
       value: 150.0,
-      description: "First sale",
+      description: "Headset",
       isPaid: false,
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       storeId: store.id,
@@ -106,7 +108,7 @@ async function main() {
   const sale2 = await prisma.sale.create({
     data: {
       value: 200.0,
-      description: "Second sale",
+      description: "Mouse",
       isPaid: true,
       dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
       storeId: store.id,
