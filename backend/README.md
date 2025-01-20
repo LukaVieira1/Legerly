@@ -21,13 +21,7 @@
    cp .env.example .env
    ```
 
-4. Configure your `.env` file with the following settings:
-
-   ```env
-   DATABASE_URL="postgresql://postgres:postgres@postgres:5432/legerly?schema=public"
-   ```
-
-5. Start the project for the first time:
+4. Start the project for the first time:
 
    ```bash
    # Build and start containers
@@ -218,12 +212,106 @@ If you need to start fresh:
 backend/
 ├── prisma/
 │   ├── schema.prisma    # Database schema
-│   └── seed.js          # Seed data
+│   └── seed.ts          # Seed data
 ├── scripts/
 │   ├── start.sh         # Container startup script
 │   └── wait-for-it.sh   # Database wait script
 ├── src/
-│   └── server.js        # Main application file
+│   ├── controllers/     # Controller logic
+│   ├── routes/          # API routes
+│   └── server.ts        # Main application file
+├── postman/
+│   └── Legerly.postman_collection.json # Postman collection
 ├── Dockerfile           # Container configuration
 └── package.json         # Dependencies and scripts
 ```
+
+## 📡 API Endpoints
+
+### 🔐 Authentication
+
+- `POST /auth/login` - User login
+- `POST /auth/register` - Register new user (requires OWNER)
+
+### 🏪 Store
+
+- `GET /store/metrics` - Store metrics (debits, payments)
+- `GET /store/details` - Store details
+- `POST /store` - Create new store (requires OWNER)
+- `PUT /store` - Update store (requires OWNER)
+- `DELETE /store` - Delete store (requires OWNER)
+
+### 👥 Users
+
+- `GET /users` - List store users
+- `POST /users` - Create user (OWNER: all roles, MANAGER: EMPLOYEE only)
+- `PUT /users/:id` - Update user (OWNER: all roles, MANAGER: EMPLOYEE only)
+- `DELETE /users/:id` - Delete user (OWNER: all except last OWNER, MANAGER: EMPLOYEE only)
+
+### 👤 Clients
+
+- `GET /clients` - List clients
+- `POST /clients` - Create client
+- `PUT /clients/:id` - Update client
+- `GET /clients/:id` - Get client by ID
+- `DELETE /clients/:id` - Delete client (requires OWNER/MANAGER)
+- `PATCH /clients/:id/debit-balance` - Update debit balance
+- `PATCH /clients/:id/observations` - Update observations
+
+### 💰 Sales
+
+- `GET /sales` - List sales
+- `POST /sales` - Create sale
+- `PUT /sales/:id` - Update sale (requires OWNER/MANAGER)
+- `DELETE /sales/:id` - Delete sale (requires OWNER/MANAGER)
+- `GET /sales/client/:clientId` - List sales by client
+
+### 💵 Payments
+
+- `GET /payments` - List store payments
+- `POST /payments` - Create payment
+- `DELETE /payments/:id` - Delete payment (requires OWNER/MANAGER)
+- `GET /payments/sale/:saleId` - List payments by sale
+- `GET /payments/client/:clientId` - List payments by client
+
+## 📦 Postman Collection
+
+### Importing the Collection
+
+1. Open Postman
+2. Click "Import"
+3. Drag the `Legerly.postman_collection.json` file or click to select it
+4. The collection will be imported with all endpoints configured
+
+### Environment Setup
+
+1. Create a new environment in Postman
+2. Add the variables:
+   - `url`: http://localhost:5050 (or your API URL)
+   - `token`: (will be automatically filled after login)
+3. Add the collection to the environment
+
+### Authentication
+
+The collection includes:
+
+- Pre-request script for token management
+- Environment variables for configuration
+- Required headers already configured
+
+### Testing Endpoints
+
+1. Execute login first to obtain the token
+2. All other endpoints are configured to use the token
+3. Payload examples included in each request
+4. Detailed documentation for each endpoint
+
+### Included Examples
+
+- Store creation
+- Complete sales flow
+- Client management
+- Payment control
+- User management
+
+The collection is kept up to date with all API features.
