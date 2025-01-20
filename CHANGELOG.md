@@ -1,5 +1,18 @@
 # Changelog
 
+## 2025-01-20, v0.2.0
+
+### Added
+
+- client routes
+- user routes
+- store routes
+- sale routes
+- payment routes
+- postman collection
+- auth routes
+- readme improvements
+
 ## 2025-01-19, v0.1.0
 
 ### Added
