@@ -4,6 +4,8 @@ import { clientRoutes } from "./client.routes";
 import { saleRoutes } from "./sale.routes";
 import { authenticate } from "../middlewares/auth";
 import { paymentRoutes } from "./payment.routes";
+import { storeRoutes } from "./store.routes";
+import { userRoutes } from "./user.routes";
 
 export default async function appRoutes(app: FastifyInstance) {
   // Decorate the request with user
@@ -24,5 +26,7 @@ export default async function appRoutes(app: FastifyInstance) {
     protectedRoutes.register(clientRoutes, { prefix: "/clients" });
     protectedRoutes.register(saleRoutes, { prefix: "/sales" });
     protectedRoutes.register(paymentRoutes, { prefix: "/payments" });
+    protectedRoutes.register(storeRoutes, { prefix: "/store" });
+    protectedRoutes.register(userRoutes, { prefix: "/users" });
   });
 }
