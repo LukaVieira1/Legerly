@@ -8,7 +8,6 @@ export async function clientRoutes(app: FastifyInstance) {
   app.post("/", clientController.create);
   app.put("/:id", clientController.update);
   app.get("/:id", clientController.getById);
-  app.patch("/:id/debit-balance", clientController.updateDebt);
   app.patch("/:id/observations", clientController.updateObservations);
   app.delete("/:id", clientController.delete);
 }

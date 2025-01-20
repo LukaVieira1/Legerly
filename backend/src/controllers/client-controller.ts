@@ -7,14 +7,9 @@ const createClientSchema = z.object({
   phone: z.string(),
   birthDate: z.string().transform((date) => new Date(date)),
   observations: z.string().optional(),
-  debitBalance: z.number().min(0).optional(),
 });
 
 const updateClientSchema = createClientSchema.partial();
-
-const updateDebtSchema = z.object({
-  debt: z.number().min(0),
-});
 
 const updateObservationsSchema = z.object({
   observations: z.string(),
@@ -37,7 +32,6 @@ export class ClientController {
           phone: clientData.phone,
           birthDate: clientData.birthDate,
           observations: clientData.observations,
-          debitBalance: clientData.debitBalance,
           storeId: storeId,
         },
       });
@@ -119,46 +113,6 @@ export class ClientController {
 
       return client;
     } catch (error) {
-      return reply.status(500).send({ message: "Internal server error" });
-    }
-  }
-
-  async updateDebt(request: FastifyRequest, reply: FastifyReply) {
-    try {
-      const { role, storeId } = request.user;
-
-      if (!["OWNER", "MANAGER", "EMPLOYEE"].includes(role)) {
-        return reply.status(403).send({ message: "Insufficient permissions" });
-      }
-
-      const { id } = z.object({ id: z.string() }).parse(request.params);
-      const { debt } = updateDebtSchema.parse(request.body);
-
-      const client = await prisma.client.findUnique({
-        where: { id: Number(id) },
-      });
-
-      if (!client) {
-        return reply.status(404).send({ message: "Client not found" });
-      }
-
-      if (client.storeId !== storeId) {
-        return reply.status(403).send({ message: "Access denied" });
-      }
-
-      const updatedClient = await prisma.client.update({
-        where: { id: Number(id) },
-        data: { debitBalance: debt },
-      });
-
-      return updatedClient;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return reply.status(400).send({
-          message: "Invalid input",
-          errors: error.errors,
-        });
-      }
       return reply.status(500).send({ message: "Internal server error" });
     }
   }
