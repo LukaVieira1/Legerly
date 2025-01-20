@@ -1,23 +1,42 @@
 import fastify from "fastify";
 import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
+import appRoutes from "./routes";
 
-const server = fastify({ logger: true });
+const app = fastify({
+  logger: true,
+  ajv: {
+    customOptions: {
+      removeAdditional: "all",
+      coerceTypes: true,
+      useDefaults: true,
+    },
+  },
+});
+
 const prisma = new PrismaClient();
 
-server.register(cors, {
+declare module "fastify" {
+  interface FastifyInstance {
+    prisma: PrismaClient;
+  }
+}
+
+app.decorate("prisma", prisma);
+
+app.register(cors, {
   origin: true,
+  credentials: true,
 });
 
-server.get("/", async (request, reply) => {
-  return { hello: "world" };
-});
+app.register(appRoutes);
 
 const start = async (): Promise<void> => {
   try {
-    await server.listen({ port: 5050, host: "0.0.0.0" });
+    await app.listen({ port: 5050, host: "0.0.0.0" });
+    console.log("Server is running on http://localhost:5050");
   } catch (err) {
-    server.log.error(err);
+    app.log.error(err);
     process.exit(1);
   }
 };

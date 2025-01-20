@@ -1,6 +1,6 @@
 {
   "name": "legerly",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "start:backend": "yarn --cwd backend start",
     "start:frontend": "yarn --cwd frontend start",
