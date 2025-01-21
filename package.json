@@ -1,5 +1,5 @@
 {
-  "name": "legerly",
+  "name": "ledgerly",
   "version": "0.2.0",
   "scripts": {
     "start:backend": "yarn --cwd backend start",
