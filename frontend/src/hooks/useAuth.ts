@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { IUser, IAuthResponse } from "@/types/auth";
 import { login } from "@/services/auth";
 import api from "@/lib/api";
+import { toast } from "react-toastify";
 
 export function useAuth() {
   const router = useRouter();
@@ -40,12 +41,13 @@ export function useAuth() {
       setUser(response.user);
       router.push("/");
 
+      toast.success("Login realizado com sucesso!");
       return response;
     } catch (error) {
       if (error instanceof Error) {
-        alert(error.message);
+        toast.error(error.message);
       } else {
-        alert("Ocorreu um erro inesperado");
+        toast.error("Ocorreu um erro inesperado");
       }
       return error as Error;
     }
@@ -57,6 +59,7 @@ export function useAuth() {
     delete api.defaults.headers.authorization;
     setUser(null);
     router.push("/login");
+    toast.success("Logout realizado com sucesso!");
   }
 
   return {
