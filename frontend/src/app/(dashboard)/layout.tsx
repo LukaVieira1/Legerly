@@ -19,8 +19,8 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-secondary-50">
+      <nav className="bg-white shadow-sm border-b border-secondary-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -30,7 +30,7 @@ export default function DashboardLayout({
             <div className="flex items-center">
               <button
                 onClick={signOut}
-                className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-100"
+                className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-secondary-700 hover:text-primary-600 hover:bg-secondary-100"
               >
                 Sair
               </button>

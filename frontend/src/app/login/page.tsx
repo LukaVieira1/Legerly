@@ -48,10 +48,10 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center p-8 sm:p-12 lg:p-16">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">
+            <h2 className="mt-6 text-3xl font-bold tracking-tight text-secondary-900">
               Bem-vindo de volta
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-secondary-600">
               Faça login para acessar sua conta
             </p>
           </div>
@@ -61,7 +61,7 @@ export default function Login() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-secondary-700"
                 >
                   Email
                 </label>
@@ -83,7 +83,7 @@ export default function Login() {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-secondary-700"
                 >
                   Senha
                 </label>
@@ -113,7 +113,7 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center text-sm">
-            <p className="text-gray-600">
+            <p className="text-secondary-600">
               Desenvolvido por{" "}
               <a
                 href="https://lukavieira.tech"
@@ -135,7 +135,7 @@ export default function Login() {
         <div className="absolute inset-0 flex items-center justify-center p-12">
           <div className="text-white space-y-6 max-w-lg">
             <h2 className="text-4xl font-bold">Gerencie suas vendas</h2>
-            <p className="text-lg text-blue-100">
+            <p className="text-lg text-secondary-100">
               Controle sobre clientes, vendas e pagamentos em uma única
               plataforma.
             </p>
