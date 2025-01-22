@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { IUser, IAuthResponse } from "@/types/auth";
 import { login } from "@/services/auth";
-import api from "@/lib/api";
 import { toast } from "react-toastify";
 
 export function useAuth() {
@@ -19,7 +18,6 @@ export function useAuth() {
     const storedToken = localStorage.getItem("@Legerly:token");
 
     if (storedUser && storedToken) {
-      api.defaults.headers.authorization = `Bearer ${storedToken}`;
       setUser(JSON.parse(storedUser));
     } else if (pathname !== "/login") {
       router.push("/login");
@@ -56,7 +54,6 @@ export function useAuth() {
   function signOut() {
     localStorage.removeItem("@Legerly:token");
     localStorage.removeItem("@Legerly:user");
-    delete api.defaults.headers.authorization;
     setUser(null);
     router.push("/login");
     toast.success("Logout realizado com sucesso!");
