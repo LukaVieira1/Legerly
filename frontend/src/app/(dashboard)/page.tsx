@@ -7,28 +7,37 @@ import { useAuthContext } from "@/providers/AuthProvider";
 
 // Types
 import { IStoreMetrics } from "@/types/store";
+import { ISale } from "@/types/sale";
 
 // Services
 import { getStoreMetrics } from "@/services/store";
+import { getSales } from "@/services/sale";
 
 // Components
 import { DollarCircleIcon, ExclamationCircleIcon } from "@/components/Icons";
 import DashboardLayout from "./layout";
 import { MetricCard } from "@/components/MetricCard";
 import { MetricSkeleton } from "@/components/skeletons/MetricSkeleton";
+import { SaleList } from "@/components/SaleList";
+import { SaleSkeleton } from "@/components/skeletons/SaleSkeleton";
 
 export default function Dashboard() {
   const { user } = useAuthContext();
   const [metrics, setMetrics] = useState<IStoreMetrics | null>(null);
+  const [sales, setSales] = useState<ISale[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    const fetchMetrics = async () => {
+    const fetchData = async () => {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const metrics = await getStoreMetrics();
+        const [metrics, sales] = await Promise.all([
+          getStoreMetrics(),
+          getSales(),
+        ]);
         setMetrics(metrics);
+        setSales(sales);
       } catch (error) {
         console.error(error);
       } finally {
@@ -36,7 +45,7 @@ export default function Dashboard() {
       }
     };
 
-    fetchMetrics();
+    fetchData();
   }, []);
 
   return (
@@ -70,6 +79,26 @@ export default function Dashboard() {
                 icon={<ExclamationCircleIcon />}
               />
             </>
+          )}
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-secondary-200">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-medium text-secondary-900">
+              Vendas Recentes
+            </h2>
+          </div>
+          {loading ? (
+            <div className="animate-pulse space-y-4">
+              {[1, 2, 3].map((n) => (
+                <SaleSkeleton key={n} />
+              ))}
+            </div>
+          ) : sales && sales.length !== 0 ? (
+            <SaleList sales={sales} />
+          ) : (
+            <p className="text-center text-secondary-500 py-8">
+              Nenhuma venda encontrada
+            </p>
           )}
         </div>
       </div>
