@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { IUser, IAuthResponse } from "@/types/auth";
+import { IAuthResponse } from "@/types/auth";
+import { IUser } from "@/types/user";
 import { login } from "@/services/auth";
 import { toast } from "react-toastify";
 
