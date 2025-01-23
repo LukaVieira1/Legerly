@@ -5,7 +5,11 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
 const instance = axios.create({ baseURL: apiURL });
 
 instance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("@Legerly:token");
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("@Legerly:token="))
+    ?.split("=")[1];
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

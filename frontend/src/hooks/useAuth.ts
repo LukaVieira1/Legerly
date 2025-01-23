@@ -1,30 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { IUser, IAuthResponse } from "@/types/auth";
 import { login } from "@/services/auth";
 import { toast } from "react-toastify";
 
 export function useAuth() {
   const router = useRouter();
-  const pathname = usePathname();
   const [user, setUser] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setIsLoading(true);
-    const storedUser = localStorage.getItem("@Legerly:user");
-    const storedToken = localStorage.getItem("@Legerly:token");
+    const storedUser = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("@Legerly:user="))
+      ?.split("=")[1];
 
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-    } else if (pathname !== "/login") {
-      router.push("/login");
+    if (storedUser) {
+      setUser(JSON.parse(decodeURIComponent(storedUser)));
     }
 
     setIsLoading(false);
-  }, [pathname, router]);
+  }, []);
 
   async function signIn(
     email: string,
@@ -33,11 +32,13 @@ export function useAuth() {
     try {
       const response = await login(email, password);
 
-      localStorage.setItem("@Legerly:token", response.token);
-      localStorage.setItem("@Legerly:user", JSON.stringify(response.user));
+      document.cookie = `@Legerly:token=${response.token}; path=/`;
+      document.cookie = `@Legerly:user=${encodeURIComponent(
+        JSON.stringify(response.user)
+      )}; path=/`;
 
       setUser(response.user);
-      router.push("/");
+      router.push("/dashboard");
 
       toast.success("Login realizado com sucesso!");
       return response;
@@ -52,8 +53,10 @@ export function useAuth() {
   }
 
   function signOut() {
-    localStorage.removeItem("@Legerly:token");
-    localStorage.removeItem("@Legerly:user");
+    document.cookie =
+      "@Legerly:token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie =
+      "@Legerly:user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setUser(null);
     router.push("/login");
     toast.success("Logout realizado com sucesso!");
