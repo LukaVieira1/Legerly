@@ -2,8 +2,8 @@
 
 import { ReactNode, createContext, useContext } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { IUser, IAuthResponse } from "@/types/auth";
-
+import { IAuthResponse } from "@/types/auth";
+import { IUser } from "@/types/user";
 interface AuthContextData {
   user: IUser | null;
   signIn: (email: string, password: string) => Promise<IAuthResponse | Error>;
