@@ -8,6 +8,15 @@ import {
   FiPhone,
   FiCreditCard,
   FiClipboard,
+  FiLogOut,
+  FiHome,
+  FiUsers,
+  FiEdit2,
+  FiTrash,
+  FiPlus,
+  FiMinus,
+  FiMessageSquare,
+  FiX,
 } from "react-icons/fi";
 
 interface IconProps {
@@ -56,4 +65,40 @@ export function CreditCardIcon({ className = "w-6 h-6" }: IconProps) {
 
 export function ClipboardIcon({ className = "w-6 h-6" }: IconProps) {
   return <FiClipboard className={className} />;
+}
+
+export function LogOutIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiLogOut className={className} />;
+}
+
+export function HomeIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiHome className={className} />;
+}
+
+export function UsersIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiUsers className={className} />;
+}
+
+export function EditIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiEdit2 className={className} />;
+}
+
+export function TrashIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiTrash className={className} />;
+}
+
+export function PlusIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiPlus className={className} />;
+}
+
+export function MinusIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiMinus className={className} />;
+}
+
+export function MessageSquareIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiMessageSquare className={className} />;
+}
+
+export function XIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiX className={className} />;
 }
