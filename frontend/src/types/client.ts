@@ -3,9 +3,16 @@ export interface IClient {
   name: string;
   phone: string;
   birthDate: string;
-  observations: string;
-  debitBalance: string;
+  observations: string | null;
+  debitBalance: number;
+  storeId: number;
   createdAt: string;
   updatedAt: string;
-  storeId: number;
+}
+
+export interface IClientForm {
+  name: string;
+  phone: string;
+  birthDate: string;
+  observations?: string | null;
 }
