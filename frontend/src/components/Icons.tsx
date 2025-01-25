@@ -102,3 +102,7 @@ export function MessageSquareIcon({ className = "w-6 h-6" }: IconProps) {
 export function XIcon({ className = "w-6 h-6" }: IconProps) {
   return <FiX className={className} />;
 }
+
+export function DollarIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiDollarSign className={className} />;
+}
