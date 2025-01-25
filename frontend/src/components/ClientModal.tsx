@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 // Hooks
-import { useClients } from "@/hooks/useClients";
+import { useClientContext } from "@/providers/ClientProvider";
 
 // Types
 import { IClient } from "@/types/client";
@@ -48,7 +48,7 @@ interface ClientModalProps {
 }
 
 export function ClientModal({ isOpen, onClose, client }: ClientModalProps) {
-  const { createClient, updateClient } = useClients();
+  const { createClient, updateClient } = useClientContext();
   const {
     register,
     handleSubmit,

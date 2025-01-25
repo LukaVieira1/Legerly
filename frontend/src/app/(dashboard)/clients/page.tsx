@@ -1,23 +1,14 @@
-// Next
 "use client";
-import { useEffect, useState } from "react";
-
-// Hooks
-import { useClients } from "@/hooks/useClients";
-
-// Types
+import { useState } from "react";
+import { useClientContext } from "@/providers/ClientProvider";
 import { IClient } from "@/types/client";
-
-// Icons
 import { FiUserPlus } from "react-icons/fi";
-
-// Components
 import { ClientList } from "@/components/ClientList";
 import { ClientModal } from "@/components/ClientModal";
 import { ClientSkeleton } from "@/components/skeletons/ClientSkeleton";
 
 export default function Clients() {
-  const { clients, isLoading } = useClients();
+  const { clients, isLoading } = useClientContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<IClient | null>(null);
 
@@ -29,10 +20,6 @@ export default function Clients() {
     }
     setIsModalOpen(true);
   }
-
-  useEffect(() => {
-    console.log(clients);
-  }, [clients]);
 
   return (
     <div className="space-y-8">
