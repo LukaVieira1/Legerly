@@ -17,7 +17,6 @@ export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
   ({ onChange, value, ...props }, ref) => {
     const handleChange = useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
-        // Pega apenas os números e limita a 16 dígitos
         const numericValue = event.target.value.replace(/\D/g, "").slice(0, 16);
 
         if (!numericValue) {
@@ -26,10 +25,8 @@ export const CurrencyInput = forwardRef<HTMLInputElement, CurrencyInputProps>(
           return;
         }
 
-        // Converte para centavos
         const cents = parseInt(numericValue, 10);
 
-        // Formata o valor
         const formattedValue = new Intl.NumberFormat("pt-BR", {
           style: "currency",
           currency: "BRL",
