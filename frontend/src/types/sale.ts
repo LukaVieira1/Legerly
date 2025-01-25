@@ -16,3 +16,11 @@ export interface ISale {
   client: IClient;
   user: IShortUser;
 }
+
+export interface ISaleForm {
+  clientId: number;
+  value: number;
+  description: string;
+  dueDate: string;
+  isPaid: boolean;
+}
