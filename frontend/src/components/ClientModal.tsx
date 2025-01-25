@@ -1,5 +1,5 @@
 // Next
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 
 // Forms
 import { useForm, Controller } from "react-hook-form";
@@ -58,16 +58,26 @@ export function ClientModal({ isOpen, onClose, client }: ClientModalProps) {
     formState: { errors, isSubmitting },
   } = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
-    defaultValues: client
-      ? {
-          ...client,
-          birthDate: client.birthDate
-            ? new Date(client.birthDate).toISOString().split("T")[0]
-            : undefined,
-          observations: client.observations || undefined,
-        }
-      : {},
+    defaultValues: {
+      name: "",
+      phone: "",
+      birthDate: "",
+      observations: "",
+    },
   });
+
+  useEffect(() => {
+    if (isOpen && client) {
+      reset({
+        name: client.name,
+        phone: client.phone.replace(/\D/g, ""),
+        birthDate: client.birthDate
+          ? new Date(client.birthDate).toISOString().split("T")[0]
+          : "",
+        observations: client.observations || "",
+      });
+    }
+  }, [client, isOpen, reset]);
 
   async function onSubmit(data: ClientFormData) {
     try {
@@ -85,7 +95,12 @@ export function ClientModal({ isOpen, onClose, client }: ClientModalProps) {
   }
 
   function handleClose() {
-    reset();
+    reset({
+      name: "",
+      phone: "",
+      birthDate: "",
+      observations: "",
+    });
     onClose();
   }
 
