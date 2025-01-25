@@ -17,6 +17,7 @@ import {
   FiMinus,
   FiMessageSquare,
   FiX,
+  FiSearch,
 } from "react-icons/fi";
 
 interface IconProps {
@@ -105,4 +106,8 @@ export function XIcon({ className = "w-6 h-6" }: IconProps) {
 
 export function DollarIcon({ className = "w-6 h-6" }: IconProps) {
   return <FiDollarSign className={className} />;
+}
+
+export function SearchIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiSearch className={className} />;
 }
