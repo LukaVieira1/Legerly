@@ -159,17 +159,16 @@ export function SaleList({ sales }: SaleListProps) {
                               {formatCurrency(Number(sale.client.debitBalance))}
                             </span>
                           </div>
-                          {sale.client.observations && (
-                            <div className="text-sm flex flex-col space-y-1">
-                              <span className="text-secondary-500 flex items-center space-x-2">
-                                <ClipboardIcon className="w-4 h-4 text-secondary-400 flex-shrink-0" />
-                                <span>Observações:</span>
-                              </span>
-                              <span className="text-secondary-900 break-words">
-                                {sale.client.observations}
-                              </span>
-                            </div>
-                          )}
+
+                          <div className="text-sm flex flex-col space-y-1">
+                            <span className="text-secondary-500 flex items-center space-x-2">
+                              <ClipboardIcon className="w-4 h-4 text-secondary-400 flex-shrink-0" />
+                              <span>Observações:</span>
+                            </span>
+                            <span className="text-secondary-900 break-words">
+                              {sale.client.observations || "Nenhuma observação"}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
