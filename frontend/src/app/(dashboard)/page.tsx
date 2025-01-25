@@ -7,11 +7,11 @@ import { useAuthContext } from "@/providers/AuthProvider";
 
 // Types
 import { IStoreMetrics } from "@/types/store";
-import { ISale } from "@/types/sale";
+import { ISale, ISaleForm } from "@/types/sale";
 
 // Services
 import { getStoreMetrics } from "@/services/store";
-import { getSales } from "@/services/sale";
+import { createSale, getSales } from "@/services/sale";
 
 // Components
 import { DollarCircleIcon, ExclamationCircleIcon } from "@/components/Icons";
@@ -20,12 +20,15 @@ import { MetricCard } from "@/components/MetricCard";
 import { MetricSkeleton } from "@/components/skeletons/MetricSkeleton";
 import { SaleList } from "@/components/SaleList";
 import { SaleSkeleton } from "@/components/skeletons/SaleSkeleton";
+import { SaleModal } from "@/components/SaleModal";
+import { toast } from "react-toastify";
 
 export default function Dashboard() {
   const { user } = useAuthContext();
   const [metrics, setMetrics] = useState<IStoreMetrics | null>(null);
   const [sales, setSales] = useState<ISale[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -40,6 +43,7 @@ export default function Dashboard() {
         setSales(sales);
       } catch (error) {
         console.error(error);
+        toast.error("Erro ao carregar dados");
       } finally {
         setLoading(false);
       }
@@ -47,6 +51,32 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const metrics = await getStoreMetrics();
+        setMetrics(metrics);
+      } catch (error) {
+        console.error(error);
+        toast.error("Erro ao carregar as métricas");
+      }
+    };
+    fetchMetrics();
+  }, [sales]);
+
+  const handleAddSale = async (sale: ISaleForm) => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const newSale = await createSale(sale);
+      setSales([...(sales || []), newSale]);
+      setIsModalOpen(false);
+      return newSale;
+    } catch (error) {
+      return error;
+    } finally {
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -60,6 +90,7 @@ export default function Dashboard() {
             Bem-vindo ao painel de controle da {user?.store.name}
           </p>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {loading ? (
             <>
@@ -81,11 +112,20 @@ export default function Dashboard() {
             </>
           )}
         </div>
+
         <div className="bg-white p-6 rounded-lg shadow-sm border border-secondary-200">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-medium text-secondary-900">
               Vendas Recentes
             </h2>
+            <div className="flex justify-end border-secondary-200">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+              >
+                Nova Venda
+              </button>
+            </div>
           </div>
           {loading ? (
             <div className="animate-pulse space-y-4">
@@ -102,6 +142,11 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+      <SaleModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddSale={handleAddSale}
+      />
     </DashboardLayout>
   );
 }
