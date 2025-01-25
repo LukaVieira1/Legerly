@@ -2,7 +2,7 @@
 import { Fragment } from "react";
 
 // Forms
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -31,10 +31,11 @@ import {
 } from "@/components/Icons";
 import { Input } from "@/components/ui/Input";
 import { TextArea } from "@/components/ui/TextArea";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 
 const clientSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
-  phone: z.string().min(10, "Telefone inválido"),
+  phone: z.string().min(10, "Telefone inválido").max(11, "Telefone inválido"),
   birthDate: z.string().min(1, "Data de nascimento é obrigatória"),
   observations: z.string().optional(),
 });
@@ -52,6 +53,7 @@ export function ClientModal({ isOpen, onClose, client }: ClientModalProps) {
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<ClientFormData>({
@@ -157,18 +159,26 @@ export function ClientModal({ isOpen, onClose, client }: ClientModalProps) {
                     {...register("name")}
                   />
 
-                  <Input
-                    label="Telefone"
-                    icon={<PhoneIcon className="w-4 h-4" />}
-                    placeholder="(00) 00000-0000"
-                    error={errors.phone}
-                    {...register("phone")}
+                  <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field }) => (
+                      <PhoneInput
+                        label="Telefone"
+                        icon={<PhoneIcon className="w-4 h-4" />}
+                        placeholder="(00) 00000-0000"
+                        error={errors.phone}
+                        onChange={field.onChange}
+                        value={field.value}
+                      />
+                    )}
                   />
 
                   <Input
                     label="Data de Nascimento"
                     icon={<CalendarIcon className="w-4 h-4" />}
                     type="date"
+                    error={errors.birthDate}
                     {...register("birthDate")}
                   />
 
