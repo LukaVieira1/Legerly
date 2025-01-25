@@ -50,11 +50,9 @@ export function ClientList({ clients, onEdit }: ClientListProps) {
             </button>
           </div>
 
-          {client.observations && (
-            <div className="mt-4 text-sm text-secondary-600 bg-secondary-50 p-3 rounded-lg">
-              {client.observations}
-            </div>
-          )}
+          <div className="mt-4 text-sm text-secondary-600 bg-secondary-50 p-3 rounded-lg">
+            {client.observations || "Sem observações"}
+          </div>
         </div>
       ))}
     </div>
