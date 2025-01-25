@@ -1,4 +1,4 @@
-# Legerly
+# Ledgerly
 
 This is a simple project to manage sales and payments for a store.
 

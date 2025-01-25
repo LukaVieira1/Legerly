@@ -16,7 +16,7 @@ export function useAuth() {
     setIsLoading(true);
     const storedUser = document.cookie
       .split("; ")
-      .find((row) => row.startsWith("@Legerly:user="))
+      .find((row) => row.startsWith("@Ledgerly:user="))
       ?.split("=")[1];
 
     if (storedUser) {
@@ -33,8 +33,8 @@ export function useAuth() {
     try {
       const response = await login(email, password);
 
-      document.cookie = `@Legerly:token=${response.token}; path=/`;
-      document.cookie = `@Legerly:user=${encodeURIComponent(
+      document.cookie = `@Ledgerly:token=${response.token}; path=/`;
+      document.cookie = `@Ledgerly:user=${encodeURIComponent(
         JSON.stringify(response.user)
       )}; path=/`;
 
@@ -55,9 +55,9 @@ export function useAuth() {
 
   function signOut() {
     document.cookie =
-      "@Legerly:token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      "@Ledgerly:token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     document.cookie =
-      "@Legerly:user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      "@Ledgerly:user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setUser(null);
     router.push("/login");
     toast.success("Logout realizado com sucesso!");

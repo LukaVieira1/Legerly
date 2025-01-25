@@ -35,7 +35,7 @@ export default function DashboardLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex items-center space-x-8">
-                <h1 className="text-xl font-bold text-primary-600">Legerly</h1>
+                <h1 className="text-xl font-bold text-primary-600">Ledgerly</h1>
                 <div className="hidden sm:flex sm:space-x-4">
                   {navigation.map((item) => {
                     const isActive = pathname === item.href;

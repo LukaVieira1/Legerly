@@ -7,7 +7,7 @@ const instance = axios.create({ baseURL: apiURL });
 instance.interceptors.request.use((config) => {
   const token = document.cookie
     .split("; ")
-    .find((row) => row.startsWith("@Legerly:token="))
+    .find((row) => row.startsWith("@Ledgerly:token="))
     ?.split("=")[1];
 
   if (token) {
