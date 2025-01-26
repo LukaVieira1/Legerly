@@ -10,6 +10,7 @@ import {
   PhoneIcon,
   CreditCardIcon,
   ClipboardIcon,
+  PaymentIcon,
 } from "@/components/Icons";
 
 interface SaleListProps {
@@ -170,6 +171,64 @@ export function SaleList({ sales }: SaleListProps) {
                             </span>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4 mt-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-secondary-900 flex items-center space-x-2 mb-3">
+                        <PaymentIcon className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                        <span>Histórico de Pagamentos</span>
+                      </h4>
+                      <div className="bg-white p-3 rounded-lg border border-secondary-200">
+                        {sale.payments.length > 0 ? (
+                          <div className="space-y-3">
+                            {sale.payments.map((payment) => (
+                              <div
+                                key={payment.id}
+                                className="flex items-center justify-between text-sm border-b border-secondary-100 last:border-0 pb-2 last:pb-0"
+                              >
+                                <div className="flex flex-col">
+                                  <span className="text-secondary-900">
+                                    {formatCurrency(Number(payment.value))}
+                                  </span>
+                                  <span className="text-xs text-secondary-500">
+                                    {formatDate(payment.payDate)}
+                                  </span>
+                                </div>
+                                <div className="flex items-center">
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800">
+                                    Pago
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-secondary-500 text-center py-2">
+                            Nenhum pagamento registrado
+                          </div>
+                        )}
+
+                        {!sale.isPaid && (
+                          <div className="mt-3 pt-3 border-t border-secondary-200">
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-secondary-600">
+                                Valor Restante:
+                              </span>
+                              <span className="font-medium text-warning-600">
+                                {formatCurrency(
+                                  Number(sale.value) -
+                                    sale.payments.reduce(
+                                      (acc, payment) =>
+                                        acc + Number(payment.value),
+                                      0
+                                    )
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
