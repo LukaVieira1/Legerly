@@ -18,6 +18,7 @@ import {
   FiMessageSquare,
   FiX,
   FiSearch,
+  FiCreditCard as FiPayment,
 } from "react-icons/fi";
 
 interface IconProps {
@@ -110,4 +111,8 @@ export function DollarIcon({ className = "w-6 h-6" }: IconProps) {
 
 export function SearchIcon({ className = "w-6 h-6" }: IconProps) {
   return <FiSearch className={className} />;
+}
+
+export function PaymentIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiPayment className={className} />;
 }
