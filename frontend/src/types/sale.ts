@@ -1,12 +1,6 @@
 import { IShortUser } from "./user";
 import { IClient } from "./client";
-
-interface IPayment {
-  id: number;
-  value: number;
-  payDate: string;
-  createdAt: string;
-}
+import { IPayment } from "./payment";
 
 export interface ISale {
   id: number;
