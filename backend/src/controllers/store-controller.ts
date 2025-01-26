@@ -16,7 +16,7 @@ export class StoreController {
   async getMetrics(request: FastifyRequest) {
     const { storeId } = request.user;
 
-    const [totalDebits, totalPayments] = await Promise.all([
+    const [totalDebits, totalPayments, totalPaidSales] = await Promise.all([
       prisma.client.aggregate({
         where: { storeId },
         _sum: {
@@ -34,11 +34,27 @@ export class StoreController {
           value: true,
         },
       }),
+
+      prisma.sale.aggregate({
+        where: {
+          storeId,
+          isPaid: true,
+          payments: {
+            none: {},
+          },
+        },
+        _sum: {
+          value: true,
+        },
+      }),
     ]);
+
+    const totalPaymentsValue = Number(totalPayments._sum.value || 0);
+    const totalPaidSalesValue = Number(totalPaidSales._sum.value || 0);
 
     return {
       totalDebits: totalDebits._sum.debitBalance || 0,
-      totalPayments: totalPayments._sum.value || 0,
+      totalPayments: totalPaymentsValue + totalPaidSalesValue,
       updatedAt: new Date(),
     };
   }
