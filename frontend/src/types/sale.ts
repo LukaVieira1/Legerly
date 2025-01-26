@@ -1,6 +1,13 @@
 import { IShortUser } from "./user";
 import { IClient } from "./client";
 
+interface IPayment {
+  id: number;
+  value: number;
+  payDate: string;
+  createdAt: string;
+}
+
 export interface ISale {
   id: number;
   value: string;
@@ -15,6 +22,7 @@ export interface ISale {
   userId: number;
   client: IClient;
   user: IShortUser;
+  payments: IPayment[];
 }
 
 export interface ISaleForm {
