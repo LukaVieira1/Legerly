@@ -69,7 +69,7 @@ export default function Dashboard() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const newSale = await createSale(sale);
-      setSales([...(sales || []), newSale]);
+      setSales([newSale, ...(sales || [])]);
       setIsModalOpen(false);
       return newSale;
     } catch (error) {
