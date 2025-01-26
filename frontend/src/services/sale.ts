@@ -18,3 +18,12 @@ export const createSale = async (sale: ISaleForm): Promise<ISale> => {
     throw error;
   }
 };
+
+export const getSaleById = async (id: number): Promise<ISale> => {
+  try {
+    const response = await api.get(`/sales/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
