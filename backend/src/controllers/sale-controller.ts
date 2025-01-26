@@ -163,6 +163,17 @@ export class SaleController {
             email: true,
           },
         },
+        payments: {
+          select: {
+            id: true,
+            value: true,
+            payDate: true,
+            createdAt: true,
+          },
+          orderBy: {
+            payDate: "desc",
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -197,6 +208,17 @@ export class SaleController {
               id: true,
               name: true,
               email: true,
+            },
+          },
+          payments: {
+            select: {
+              id: true,
+              value: true,
+              payDate: true,
+              createdAt: true,
+            },
+            orderBy: {
+              payDate: "desc",
             },
           },
         },
