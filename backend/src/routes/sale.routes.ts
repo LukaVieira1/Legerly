@@ -9,4 +9,5 @@ export async function saleRoutes(app: FastifyInstance) {
   app.put("/:id", saleController.update);
   app.delete("/:id", saleController.delete);
   app.get("/client/:clientId", saleController.listByClient);
+  app.get("/:id", saleController.listById);
 }

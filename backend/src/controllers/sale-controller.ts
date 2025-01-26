@@ -192,6 +192,46 @@ export class SaleController {
     return sales;
   }
 
+  async listById(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const { storeId } = request.user;
+      const { id } = z.object({ id: z.string() }).parse(request.params);
+
+      const sale = await prisma.sale.findUnique({
+        where: { id: Number(id) },
+        include: {
+          client: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          payments: {
+            select: {
+              id: true,
+              value: true,
+              payDate: true,
+              createdAt: true,
+            },
+            orderBy: {
+              payDate: "desc",
+            },
+          },
+        },
+      });
+
+      if (!sale || sale.storeId !== storeId) {
+        return reply.status(404).send({ message: "Sale not found" });
+      }
+
+      return sale;
+    } catch (error) {
+      return reply.status(500).send({ message: "Internal server error" });
+    }
+  }
+
   async listByClient(request: FastifyRequest, reply: FastifyReply) {
     try {
       const { storeId } = request.user;
