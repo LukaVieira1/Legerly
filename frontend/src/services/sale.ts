@@ -27,3 +27,11 @@ export const getSaleById = async (id: number): Promise<ISale> => {
     throw error;
   }
 };
+
+export const deleteSale = async (id: number): Promise<void> => {
+  try {
+    await api.delete(`/sales/${id}`);
+  } catch (error) {
+    throw error;
+  }
+};

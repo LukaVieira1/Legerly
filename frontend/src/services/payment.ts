@@ -11,3 +11,11 @@ export const createPayment = async (
     throw error;
   }
 };
+
+export const deletePayment = async (id: number): Promise<void> => {
+  try {
+    await api.delete(`/payments/${id}`);
+  } catch (error) {
+    throw error;
+  }
+};
