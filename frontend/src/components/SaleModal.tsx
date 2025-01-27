@@ -74,6 +74,7 @@ export function SaleModal({ isOpen, onClose, onAddSale }: SaleModalProps) {
         isPaid: data.isPaid,
       });
       toast.success("Venda adicionada com sucesso");
+      reset();
     } catch (error) {
       console.error(error);
       toast.error("Erro ao adicionar venda");
