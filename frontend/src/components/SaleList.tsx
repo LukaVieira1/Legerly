@@ -11,18 +11,36 @@ import {
   CreditCardIcon,
   ClipboardIcon,
   PaymentIcon,
+  TrashIcon,
 } from "@/components/Icons";
 import { PaymentModal } from "./PaymentModal";
+import { DeleteSaleModal } from "./DeleteSaleModal";
+import { DeletePaymentModal } from "./DeletePaymentModal";
+import { IPayment } from "@/types/payment";
 
 interface SaleListProps {
   sales: ISale[];
   onAddPayment: (value: number, saleId: number) => Promise<void>;
+  onDeleteSale: (saleId: number) => Promise<void>;
+  onDeletePayment: (paymentId: number, saleId: number) => Promise<void>;
 }
 
-export function SaleList({ sales, onAddPayment }: SaleListProps) {
+export function SaleList({
+  sales,
+  onAddPayment,
+  onDeleteSale,
+  onDeletePayment,
+}: SaleListProps) {
   const [expandedSaleId, setExpandedSaleId] = useState<number | null>(null);
   const [selectedSale, setSelectedSale] = useState<ISale | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<{
+    payment: IPayment;
+    sale: ISale;
+  } | null>(null);
+  const [isDeletePaymentModalOpen, setIsDeletePaymentModalOpen] =
+    useState(false);
 
   return (
     <>
@@ -194,20 +212,25 @@ export function SaleList({ sales, onAddPayment }: SaleListProps) {
                               {sale.payments.map((payment) => (
                                 <div
                                   key={payment.id}
-                                  className="flex items-center justify-between text-sm border-b border-secondary-100 last:border-0 pb-2 last:pb-0"
+                                  className="flex items-center justify-between text-sm"
                                 >
-                                  <div className="flex flex-col">
-                                    <span className="text-secondary-900">
+                                  <div className="flex items-center space-x-2">
+                                    <PaymentIcon className="w-4 h-4 text-primary-500" />
+                                    <span>{formatDate(payment.payDate)}</span>
+                                  </div>
+                                  <div className="flex items-center space-x-3">
+                                    <span className="font-medium">
                                       {formatCurrency(Number(payment.value))}
                                     </span>
-                                    <span className="text-xs text-secondary-500">
-                                      {formatDate(payment.payDate)}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center">
-                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800">
-                                      Pago
-                                    </span>
+                                    <button
+                                      onClick={() => {
+                                        setSelectedPayment({ payment, sale });
+                                        setIsDeletePaymentModalOpen(true);
+                                      }}
+                                      className="p-1 text-danger-600 hover:text-danger-700 hover:bg-danger-50 rounded-full transition-colors"
+                                    >
+                                      <TrashIcon className="w-4 h-4" />
+                                    </button>
                                   </div>
                                 </div>
                               ))}
@@ -245,31 +268,70 @@ export function SaleList({ sales, onAddPayment }: SaleListProps) {
               )}
             </AnimatePresence>
 
-            {!sale.isPaid && (
+            <div className="flex items-center space-x-2 px-4 py-2">
+              {!sale.isPaid && (
+                <button
+                  onClick={() => {
+                    setSelectedSale(sale);
+                    setIsPaymentModalOpen(true);
+                  }}
+                  className="flex items-center px-3 py-1.5 text-sm text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100"
+                >
+                  <PaymentIcon className="w-4 h-4 mr-1.5" />
+                  Pagar
+                </button>
+              )}
               <button
                 onClick={() => {
                   setSelectedSale(sale);
-                  setIsPaymentModalOpen(true);
+                  setIsDeleteModalOpen(true);
                 }}
-                className="mt-4 w-full flex justify-center items-center px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
+                className="flex items-center px-3 py-1.5 text-sm text-danger-600 bg-danger-50 rounded-lg hover:bg-danger-100"
               >
-                <PaymentIcon className="w-4 h-4 mr-2" />
-                Registrar Pagamento
+                <TrashIcon className="w-4 h-4 mr-1.5" />
+                Excluir
               </button>
-            )}
+            </div>
           </motion.div>
         ))}
       </div>
 
       {selectedSale && (
-        <PaymentModal
-          isOpen={isPaymentModalOpen}
+        <>
+          <PaymentModal
+            isOpen={isPaymentModalOpen}
+            onClose={() => {
+              setIsPaymentModalOpen(false);
+              setSelectedSale(null);
+            }}
+            sale={selectedSale}
+            onAddPayment={onAddPayment}
+          />
+          <DeleteSaleModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => {
+              setIsDeleteModalOpen(false);
+              setSelectedSale(null);
+            }}
+            sale={selectedSale}
+            onConfirm={() => onDeleteSale(selectedSale.id)}
+          />
+        </>
+      )}
+      {selectedPayment && (
+        <DeletePaymentModal
+          isOpen={isDeletePaymentModalOpen}
           onClose={() => {
-            setIsPaymentModalOpen(false);
-            setSelectedSale(null);
+            setIsDeletePaymentModalOpen(false);
+            setSelectedPayment(null);
           }}
-          sale={selectedSale}
-          onAddPayment={onAddPayment}
+          payment={selectedPayment.payment}
+          onConfirm={async () => {
+            await onDeletePayment(
+              selectedPayment.payment.id,
+              selectedPayment.sale.id
+            );
+          }}
         />
       )}
     </>
