@@ -11,8 +11,8 @@ import { ISale, ISaleForm } from "@/types/sale";
 
 // Services
 import { getStoreMetrics } from "@/services/store";
-import { createSale, getSaleById, getSales } from "@/services/sale";
-import { createPayment } from "@/services/payment";
+import { createSale, deleteSale, getSaleById, getSales } from "@/services/sale";
+import { createPayment, deletePayment } from "@/services/payment";
 
 // Components
 import { DollarCircleIcon, ExclamationCircleIcon } from "@/components/Icons";
@@ -99,6 +99,54 @@ export default function Dashboard() {
     }
   };
 
+  const handleDeleteSale = async (saleId: number) => {
+    try {
+      await deleteSale(saleId);
+      toast.success("Venda excluída com sucesso");
+      setSales(
+        (prevSales) => prevSales?.filter((sale) => sale.id !== saleId) || []
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        if ("status" in error && error.status === 403) {
+          toast.error("Somente proprietários ou gerentes podem excluir vendas");
+        } else {
+          toast.error("Erro ao excluir venda");
+        }
+      } else {
+        console.error("Erro desconhecido:", error);
+        toast.error("Erro ao excluir venda");
+      }
+    }
+  };
+
+  const handleDeletePayment = async (paymentId: number, saleId: number) => {
+    try {
+      await deletePayment(paymentId);
+      toast.success("Pagamento excluído com sucesso");
+      const sale = await getSaleById(saleId);
+      setSales(
+        (prevSales) =>
+          prevSales?.map((oldSale) =>
+            oldSale.id === saleId ? sale : oldSale
+          ) || []
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        if ("status" in error && error.status === 403) {
+          toast.error(
+            "Somente proprietários ou gerentes podem excluir pagamentos"
+          );
+        } else {
+          toast.error("Erro ao excluir pagamento");
+        }
+      } else {
+        console.error("Erro desconhecido:", error);
+        toast.error("Erro ao excluir pagamento");
+      }
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -155,7 +203,12 @@ export default function Dashboard() {
               ))}
             </div>
           ) : sales && sales.length !== 0 ? (
-            <SaleList sales={sales} onAddPayment={handleAddPayment} />
+            <SaleList
+              sales={sales}
+              onAddPayment={handleAddPayment}
+              onDeleteSale={handleDeleteSale}
+              onDeletePayment={handleDeletePayment}
+            />
           ) : (
             <p className="text-center text-secondary-500 py-8">
               Nenhuma venda encontrada
