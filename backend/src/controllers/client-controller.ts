@@ -52,7 +52,7 @@ export class ClientController {
     try {
       const { role, storeId } = request.user;
 
-      if (!["OWNER", "MANAGER"].includes(role)) {
+      if (!["OWNER", "MANAGER", "EMPLOYEE"].includes(role)) {
         return reply.status(403).send({ message: "Insufficient permissions" });
       }
 
