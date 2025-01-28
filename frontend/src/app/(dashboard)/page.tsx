@@ -7,7 +7,7 @@ import { useAuthContext } from "@/providers/AuthProvider";
 
 // Types
 import { IStoreMetrics } from "@/types/store";
-import { ISale, ISaleForm } from "@/types/sale";
+import { ISale, ISaleFilters, ISaleForm } from "@/types/sale";
 
 // Services
 import { getStoreMetrics } from "@/services/store";
@@ -23,48 +23,87 @@ import { SaleList } from "@/components/SaleList";
 import { SaleSkeleton } from "@/components/skeletons/SaleSkeleton";
 import { SaleModal } from "@/components/SaleModal";
 import { toast } from "react-toastify";
+import { SaleFilters } from "@/components/SaleFilters";
+import { Pagination } from "@/components/Pagination";
 
 export default function Dashboard() {
   const { user } = useAuthContext();
   const [metrics, setMetrics] = useState<IStoreMetrics | null>(null);
-  const [sales, setSales] = useState<ISale[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [sales, setSales] = useState<ISale[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    pages: 1,
+    currentPage: 1,
+    perPage: 10,
+  });
+  const [filters, setFilters] = useState<ISaleFilters>({
+    search: "",
+    isPaid: "",
+    startDate: "",
+    endDate: "",
+  });
+
+  const fetchInitialData = async () => {
+    setInitialLoading(true);
+    try {
+      const [metricsData, salesData] = await Promise.all([
+        getStoreMetrics(),
+        getSales({ page: 1, limit: pagination.perPage }),
+      ]);
+      setMetrics(metricsData);
+      setSales(salesData.sales);
+      setPagination(salesData.pagination);
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao carregar dados iniciais");
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+
+  const fetchFilteredSales = async (page = 1, currentFilters = filters) => {
+    setFilterLoading(true);
+    try {
+      const response = await getSales({
+        page,
+        limit: pagination.perPage,
+        ...currentFilters,
+      });
+      setSales(response.sales);
+      setPagination(response.pagination);
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao filtrar vendas");
+    } finally {
+      setFilterLoading(false);
+    }
+  };
+
+  const handleFilter = (newFilters: ISaleFilters) => {
+    const currentPosition = window.scrollY;
+    setFilters(newFilters);
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    setTimeout(() => window.scrollTo(0, currentPosition), 0);
+  };
 
   useEffect(() => {
-    setLoading(true);
-    const fetchData = async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const [metrics, sales] = await Promise.all([
-          getStoreMetrics(),
-          getSales(),
-        ]);
-        setMetrics(metrics);
-        setSales(sales);
-      } catch (error) {
-        console.error(error);
-        toast.error("Erro ao carregar dados");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        const metrics = await getStoreMetrics();
-        setMetrics(metrics);
-      } catch (error) {
-        console.error(error);
-        toast.error("Erro ao carregar as métricas");
+    const timer = setTimeout(() => {
+      if (!initialLoading) {
+        fetchFilteredSales(1);
       }
-    };
-    fetchMetrics();
-  }, [sales]);
+    }, 300);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, initialLoading]);
 
   const handleAddPayment = async (value: number, saleId: number) => {
     try {
@@ -161,7 +200,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {loading ? (
+          {initialLoading ? (
             <>
               <MetricSkeleton />
               <MetricSkeleton />
@@ -196,23 +235,43 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
-          {loading ? (
-            <div className="animate-pulse space-y-4">
-              {[1, 2, 3].map((n) => (
-                <SaleSkeleton key={n} />
-              ))}
+
+          <SaleFilters onFilter={handleFilter} />
+
+          <div className="mt-4 min-h-[200px] md:min-h-[500px] relative">
+            {initialLoading ? (
+              <div className="animate-pulse space-y-4">
+                {[1, 2, 3].map((n) => (
+                  <SaleSkeleton key={n} />
+                ))}
+              </div>
+            ) : filterLoading ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/80">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+              </div>
+            ) : sales.length > 0 ? (
+              <SaleList
+                sales={sales}
+                onAddPayment={handleAddPayment}
+                onDeleteSale={handleDeleteSale}
+                onDeletePayment={handleDeletePayment}
+              />
+            ) : (
+              <p className="text-center text-secondary-500 py-8">
+                Nenhuma venda encontrada
+              </p>
+            )}
+          </div>
+
+          {sales.length > 0 && !initialLoading && (
+            <div className="mt-2">
+              <Pagination
+                total={pagination.total}
+                perPage={pagination.perPage}
+                currentPage={pagination.currentPage}
+                onPageChange={(page) => fetchFilteredSales(page)}
+              />
             </div>
-          ) : sales && sales.length !== 0 ? (
-            <SaleList
-              sales={sales}
-              onAddPayment={handleAddPayment}
-              onDeleteSale={handleDeleteSale}
-              onDeletePayment={handleDeletePayment}
-            />
-          ) : (
-            <p className="text-center text-secondary-500 py-8">
-              Nenhuma venda encontrada
-            </p>
           )}
         </div>
       </div>
