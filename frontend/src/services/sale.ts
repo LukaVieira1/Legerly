@@ -1,9 +1,24 @@
-import { ISale, ISaleForm } from "@/types/sale";
+import { ISale, ISaleForm, ISaleFilters } from "@/types/sale";
 import api from "@/lib/api";
 
-export const getSales = async (): Promise<ISale[]> => {
+export const getSales = async (
+  params: ISaleFilters = {}
+): Promise<{
+  sales: ISale[];
+  pagination: {
+    total: number;
+    pages: number;
+    currentPage: number;
+    perPage: number;
+  };
+}> => {
   try {
-    const response = await api.get("/sales");
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) queryParams.append(key, value.toString());
+    });
+
+    const response = await api.get(`/sales?${queryParams.toString()}`);
     return response.data;
   } catch (error) {
     throw error;
