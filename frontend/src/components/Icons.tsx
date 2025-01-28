@@ -20,6 +20,8 @@ import {
   FiSearch,
   FiCreditCard as FiPayment,
   FiMenu,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
 
 interface IconProps {
@@ -120,4 +122,12 @@ export function PaymentIcon({ className = "w-6 h-6" }: IconProps) {
 
 export function MenuIcon({ className = "w-6 h-6" }: IconProps) {
   return <FiMenu className={className} />;
+}
+
+export function ChevronLeftIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiChevronLeft className={className} />;
+}
+
+export function ChevronRightIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiChevronRight className={className} />;
 }
