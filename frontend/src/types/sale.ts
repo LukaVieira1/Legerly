@@ -26,3 +26,12 @@ export interface ISaleForm {
   dueDate: string;
   isPaid: boolean;
 }
+
+export interface ISaleFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  isPaid?: string;
+  startDate?: string;
+  endDate?: string;
+}
