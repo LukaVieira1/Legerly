@@ -22,6 +22,7 @@ import {
   FiMenu,
   FiChevronLeft,
   FiChevronRight,
+  FiBarChart,
 } from "react-icons/fi";
 
 interface IconProps {
@@ -130,4 +131,8 @@ export function ChevronLeftIcon({ className = "w-6 h-6" }: IconProps) {
 
 export function ChevronRightIcon({ className = "w-6 h-6" }: IconProps) {
   return <FiChevronRight className={className} />;
+}
+
+export function ChartIcon({ className = "w-6 h-6" }: IconProps) {
+  return <FiBarChart className={className} />;
 }
