@@ -10,6 +10,7 @@ import {
   LogOutIcon,
   MenuIcon,
   XIcon,
+  ChartIcon,
 } from "@/components/Icons";
 import { ClientProvider } from "@/providers/ClientProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,6 +27,7 @@ export default function DashboardLayout({
   const navigation = [
     { name: "Dashboard", href: "/", icon: HomeIcon },
     { name: "Clientes", href: "/clients", icon: UsersIcon },
+    { name: "Métricas", href: "/metrics", icon: ChartIcon },
   ];
 
   if (isLoading) {
