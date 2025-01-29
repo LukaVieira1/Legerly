@@ -1,12 +1,20 @@
 import api from "@/lib/api";
-import { IStoreMetrics } from "@/types/store";
 
-export const getStoreMetrics = async (): Promise<IStoreMetrics> => {
+interface GetStoreMetricsParams {
+  startDate?: string;
+  endDate?: string;
+}
+
+export const getStoreMetrics = async (params: GetStoreMetricsParams = {}) => {
   try {
-    const response = await api.get("/store/metrics");
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) queryParams.append(key, value);
+    });
+
+    const response = await api.get(`/store/metrics?${queryParams.toString()}`);
     return response.data;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
