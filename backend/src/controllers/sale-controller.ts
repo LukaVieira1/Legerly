@@ -257,7 +257,7 @@ export class SaleController {
       };
     } catch (error) {
       request.log.error(error, "Error listing sales");
-      return reply.status(500).send({ message: "Erro interno do servidor" });
+      return reply.status(500).send({ message: "Internal server error" });
     }
   }
 
