@@ -5,11 +5,10 @@ import {
   CalendarIcon,
   DollarIcon,
   ExclamationCircleIcon,
-  XIcon,
   ChevronDownIcon,
   ChevronUpIcon,
 } from "./Icons";
-
+import { ClearFiltersButton } from "./ui/ClearFilters";
 interface ClientMetricsExpandedProps {
   metrics: {
     totalPayments: number;
@@ -61,15 +60,7 @@ export function ClientMetricsExpanded({
           <h3 className="text-sm font-medium text-secondary-900">
             Filtrar por período
           </h3>
-          {hasFilters && (
-            <button
-              onClick={handleClearFilters}
-              className="flex items-center gap-1 text-sm text-secondary-600 hover:text-secondary-900"
-            >
-              <XIcon className="w-4 h-4" />
-              Limpar filtros
-            </button>
-          )}
+          {hasFilters && <ClearFiltersButton onClick={handleClearFilters} />}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input

@@ -7,7 +7,8 @@ import { getStoreMetrics } from "@/services/store";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Input } from "@/components/ui/Input";
-import { CalendarIcon, XIcon } from "@/components/Icons";
+import { CalendarIcon } from "@/components/Icons";
+import { ClearFiltersButton } from "@/components/ui/ClearFilters";
 
 export default function Metrics() {
   const [isLoading, setIsLoading] = useState(true);
@@ -63,14 +64,7 @@ export default function Metrics() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
           {(dateFilter.startDate || dateFilter.endDate) && (
             <div className="absolute right-0 top-0">
-              <button
-                onClick={handleClear}
-                disabled={isLoading}
-                className="flex items-center gap-2 text-sm text-secondary-600 hover:text-secondary-900 disabled:opacity-50"
-              >
-                <XIcon className="w-4 h-4" />
-                Limpar filtros
-              </button>
+              <ClearFiltersButton onClick={handleClear} disabled={isLoading} />
             </div>
           )}
 

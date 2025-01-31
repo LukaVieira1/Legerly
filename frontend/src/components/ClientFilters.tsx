@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "./ui/Input";
-import { SearchIcon, XIcon } from "./Icons";
-
+import { SearchIcon } from "./Icons";
+import { ClearFiltersButton } from "./ui/ClearFilters";
 interface ClientFiltersProps {
   search: string;
   onSearch: (search: string) => void;
@@ -35,14 +35,7 @@ export function ClientFilters({
     <div className="bg-white p-4 rounded-lg border border-secondary-200">
       <div className="flex items-center justify-between mb-2">
         {search && (
-          <button
-            onClick={handleClear}
-            disabled={isLoading}
-            className="flex items-center gap-2 text-sm text-secondary-600 hover:text-secondary-900 disabled:opacity-50"
-          >
-            <XIcon className="w-4 h-4" />
-            Limpar filtros
-          </button>
+          <ClearFiltersButton onClick={handleClear} disabled={isLoading} />
         )}
       </div>
 

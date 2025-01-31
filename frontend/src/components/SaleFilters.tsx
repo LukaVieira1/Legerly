@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Input } from "./ui/Input";
 import { Select } from "./ui/Select";
-import { SearchIcon, CalendarIcon, XIcon } from "./Icons";
+import { SearchIcon, CalendarIcon } from "./Icons";
 import { ISaleFilters } from "@/types/sale";
-
+import { ClearFiltersButton } from "./ui/ClearFilters";
 interface SaleFiltersProps {
   onFilter: (filters: ISaleFilters) => void;
 }
@@ -72,15 +72,7 @@ export function SaleFilters({ onFilter }: SaleFiltersProps) {
         {(filters.search ||
           filters.isPaid ||
           filters.startDate ||
-          filters.endDate) && (
-          <button
-            onClick={clearAllFilters}
-            className="flex items-center text-sm text-secondary-600 hover:text-secondary-900"
-          >
-            <XIcon className="w-4 h-4 mr-1" />
-            Limpar filtros
-          </button>
-        )}
+          filters.endDate) && <ClearFiltersButton onClick={clearAllFilters} />}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Input
