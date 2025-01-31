@@ -14,6 +14,7 @@ import {
 } from "@/components/Icons";
 import { ClientProvider } from "@/providers/ClientProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { Spinner } from "@/components/ui/Spinner";
 
 export default function DashboardLayout({
   children,
@@ -33,7 +34,7 @@ export default function DashboardLayout({
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+        <Spinner />
       </div>
     );
   }
@@ -142,7 +143,7 @@ export default function DashboardLayout({
         <Suspense
           fallback={
             <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+              <Spinner />
             </div>
           }
         >

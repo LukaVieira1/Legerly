@@ -25,6 +25,7 @@ import { SaleModal } from "@/components/SaleModal";
 import { toast } from "react-toastify";
 import { SaleFilters } from "@/components/SaleFilters";
 import { Pagination } from "@/components/Pagination";
+import { Spinner } from "@/components/ui/Spinner";
 
 export default function Dashboard() {
   const { user } = useAuthContext();
@@ -247,7 +248,7 @@ export default function Dashboard() {
               </div>
             ) : filterLoading ? (
               <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+                <Spinner />
               </div>
             ) : sales.length > 0 ? (
               <SaleList

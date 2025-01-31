@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/Spinner";
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -38,7 +39,7 @@ export default function Login() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+        <Spinner />
       </div>
     );
   }

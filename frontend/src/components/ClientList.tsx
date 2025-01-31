@@ -14,6 +14,7 @@ import { getClientMetrics } from "@/services/client";
 import { ClientFilters } from "./ClientFilters";
 import { Pagination } from "./Pagination";
 import { IPagination } from "@/types/pagination";
+import { Spinner } from "./ui/Spinner";
 interface ClientListProps {
   clients: IClient[];
   pagination: IPagination;
@@ -85,7 +86,7 @@ export function ClientList({
 
       {isLoading ? (
         <div className="flex justify-center p-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+          <Spinner />
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-secondary-200 divide-y divide-secondary-200">
@@ -141,7 +142,7 @@ export function ClientList({
                 <div className="border-t border-secondary-200 p-4">
                   {isLoadingMetrics ? (
                     <div className="flex justify-center p-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+                      <Spinner />
                     </div>
                   ) : metrics ? (
                     <ClientMetricsExpanded
