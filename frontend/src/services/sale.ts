@@ -1,16 +1,11 @@
 import { ISale, ISaleForm, ISaleFilters } from "@/types/sale";
 import api from "@/lib/api";
-
+import { IPagination } from "@/types/pagination";
 export const getSales = async (
   params: ISaleFilters = {}
 ): Promise<{
   sales: ISale[];
-  pagination: {
-    total: number;
-    pages: number;
-    currentPage: number;
-    perPage: number;
-  };
+  pagination: IPagination;
 }> => {
   try {
     const queryParams = new URLSearchParams();

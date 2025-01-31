@@ -1,3 +1,10 @@
+import { IPagination } from "./pagination";
+
+export interface IClientResponse {
+  clients: IClient[];
+  pagination: IPagination;
+}
+
 export interface IClient {
   id: number;
   name: string;

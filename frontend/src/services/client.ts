@@ -1,9 +1,12 @@
 import api from "@/lib/api";
-import { IClient, IClientForm } from "@/types/client";
+import { IClient, IClientForm, IClientResponse } from "@/types/client";
 
-export async function getClients(): Promise<IClient[]> {
+export async function getClients(filters: {
+  page: number;
+  search: string;
+}): Promise<IClientResponse> {
   try {
-    const response = await api.get("/clients");
+    const response = await api.get("/clients", { params: { ...filters } });
     return response.data;
   } catch (error) {
     throw error;
