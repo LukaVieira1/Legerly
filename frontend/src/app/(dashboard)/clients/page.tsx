@@ -8,7 +8,15 @@ import { ClientModal } from "@/components/ClientModal";
 import { ClientSkeleton } from "@/components/skeletons/ClientSkeleton";
 
 export default function Clients() {
-  const { clients, isLoading } = useClientContext();
+  const {
+    clients,
+    pagination,
+    isLoading,
+    isSearching,
+    filters,
+    handleSearch,
+    handlePageChange,
+  } = useClientContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<IClient | null>(null);
 
@@ -50,7 +58,15 @@ export default function Clients() {
           ))}
         </div>
       ) : (
-        <ClientList clients={clients} onEdit={handleOpenModal} />
+        <ClientList
+          clients={clients}
+          pagination={pagination}
+          filters={filters}
+          onEdit={handleOpenModal}
+          onSearch={handleSearch}
+          onPageChange={handlePageChange}
+          isLoading={isSearching}
+        />
       )}
 
       <ClientModal
