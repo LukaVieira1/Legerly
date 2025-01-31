@@ -1,0 +1,59 @@
+import { useState, useEffect } from "react";
+import { Input } from "./ui/Input";
+import { SearchIcon, XIcon } from "./Icons";
+
+interface ClientFiltersProps {
+  search: string;
+  onSearch: (search: string) => void;
+  isLoading?: boolean;
+}
+
+export function ClientFilters({
+  search: externalSearch,
+  onSearch,
+  isLoading,
+}: ClientFiltersProps) {
+  const [search, setSearch] = useState(externalSearch);
+
+  useEffect(() => {
+    if (externalSearch === "") {
+      setSearch("");
+    }
+  }, [externalSearch]);
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    onSearch(value);
+  };
+
+  const handleClear = () => {
+    setSearch("");
+    onSearch("");
+  };
+
+  return (
+    <div className="bg-white p-4 rounded-lg border border-secondary-200">
+      <div className="flex items-center justify-between mb-2">
+        {search && (
+          <button
+            onClick={handleClear}
+            disabled={isLoading}
+            className="flex items-center gap-2 text-sm text-secondary-600 hover:text-secondary-900 disabled:opacity-50"
+          >
+            <XIcon className="w-4 h-4" />
+            Limpar filtros
+          </button>
+        )}
+      </div>
+
+      <Input
+        label="Buscar cliente"
+        icon={<SearchIcon className="w-4 h-4" />}
+        placeholder="Nome ou telefone..."
+        value={search}
+        onChange={(e) => handleSearch(e.target.value)}
+        disabled={isLoading}
+      />
+    </div>
+  );
+}
