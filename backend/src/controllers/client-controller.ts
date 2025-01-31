@@ -89,14 +89,55 @@ export class ClientController {
   }
 
   async list(request: FastifyRequest) {
-    const { storeId } = request.user;
+    try {
+      const { storeId } = request.user;
+      const {
+        search = "",
+        page = "1",
+        limit = "10",
+      } = request.query as {
+        search?: string;
+        page?: string;
+        limit?: string;
+      };
 
-    const clients = await prisma.client.findMany({
-      where: { storeId },
-      orderBy: { name: "asc" },
-    });
+      const pageNumber = parseInt(page);
+      const limitNumber = parseInt(limit);
+      const skip = (pageNumber - 1) * limitNumber;
 
-    return clients;
+      const where = {
+        storeId,
+        ...(search && {
+          OR: [
+            { name: { contains: search, mode: "insensitive" as const } },
+            { phone: { contains: search } },
+          ],
+        }),
+      };
+
+      const [clients, total] = await Promise.all([
+        prisma.client.findMany({
+          where,
+          orderBy: { name: "asc" },
+          take: limitNumber,
+          skip,
+        }),
+        prisma.client.count({ where }),
+      ]);
+
+      return {
+        clients,
+        pagination: {
+          total,
+          pages: Math.ceil(total / limitNumber),
+          currentPage: pageNumber,
+          perPage: limitNumber,
+        },
+      };
+    } catch (error) {
+      request.log.error(error, "Error listing clients");
+      throw error;
+    }
   }
 
   async getById(request: FastifyRequest, reply: FastifyReply) {
