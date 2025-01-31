@@ -7,7 +7,7 @@ import { getStoreMetrics } from "@/services/store";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Input } from "@/components/ui/Input";
-import { CalendarIcon } from "@/components/Icons";
+import { CalendarIcon, XIcon } from "@/components/Icons";
 
 export default function Metrics() {
   const [isLoading, setIsLoading] = useState(true);
@@ -39,6 +39,13 @@ export default function Metrics() {
     setDateFilter((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleClear = () => {
+    setDateFilter({
+      startDate: "",
+      endDate: "",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-secondary-200">
@@ -53,7 +60,20 @@ export default function Metrics() {
       </div>
 
       <div className="bg-white p-4 rounded-lg border border-secondary-200">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+          {(dateFilter.startDate || dateFilter.endDate) && (
+            <div className="absolute right-0 top-0">
+              <button
+                onClick={handleClear}
+                disabled={isLoading}
+                className="flex items-center gap-2 text-sm text-secondary-600 hover:text-secondary-900 disabled:opacity-50"
+              >
+                <XIcon className="w-4 h-4" />
+                Limpar filtros
+              </button>
+            </div>
+          )}
+
           <Input
             label="Data Inicial"
             type="date"
