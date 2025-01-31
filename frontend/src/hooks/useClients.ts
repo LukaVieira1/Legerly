@@ -7,28 +7,70 @@ import {
   deleteClient as deleteClientService,
 } from "@/services/client";
 import { toast } from "react-toastify";
+import { useDebounce } from "./useDebounce";
 
 export function useClients() {
   const [clients, setClients] = useState<IClient[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    pages: 0,
+    currentPage: 1,
+    perPage: 10,
+  });
 
-  async function fetchClients() {
+  const [filters, setFilters] = useState({
+    page: 1,
+    search: "",
+  });
+
+  const fetchInitialClients = async () => {
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const data = await getClientsService();
-      setClients(data);
+      const response = await getClientsService(filters);
+      setClients(response.clients);
+      setPagination(response.pagination);
     } catch (error) {
       console.error(error);
       toast.error("Erro ao carregar clientes");
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+
+  const fetchDebouncedClients = async () => {
+    setIsSearching(true);
+    try {
+      const response = await getClientsService(filters);
+      setClients(response.clients);
+      setPagination(response.pagination);
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao carregar clientes");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const debouncedFetch = useDebounce(fetchDebouncedClients, 500);
 
   useEffect(() => {
-    fetchClients();
-  }, []);
+    if (filters.search) {
+      debouncedFetch();
+    } else {
+      fetchInitialClients();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
+  const handleSearch = (search: string) => {
+    setFilters((prev) => ({ ...prev, search, page: 1 }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setFilters((prev) => ({ ...prev, page }));
+  };
 
   async function createClient(data: IClientForm) {
     setIsLoading(true);
@@ -75,10 +117,15 @@ export function useClients() {
 
   return {
     clients,
+    pagination,
     isLoading,
+    isSearching,
+    filters,
+    handleSearch,
+    handlePageChange,
     createClient,
     updateClient,
     deleteClient,
-    refetch: fetchClients,
+    refetch: fetchInitialClients,
   };
 }
