@@ -68,25 +68,31 @@ export function StoreMetrics({ metrics }: StoreMetricsProps) {
           Maiores Vendas
         </h3>
         <div className="space-y-4">
-          {metrics.topSales.map((sale) => (
-            <div
-              key={sale.id}
-              className="flex items-center justify-between p-4 bg-secondary-50 rounded-lg"
-            >
-              <div>
-                <p className="font-medium text-secondary-900">
-                  {sale.client.name}
-                </p>
-                <p className="text-sm text-secondary-600">{sale.description}</p>
-                <p className="text-xs text-secondary-500">
-                  {formatDate(sale.saleDate)}
+          {metrics.topSales.length > 0 ? (
+            metrics.topSales.map((sale) => (
+              <div
+                key={sale.id}
+                className="flex items-center justify-between p-4 bg-secondary-50 rounded-lg"
+              >
+                <div>
+                  <p className="font-medium text-secondary-900">
+                    {sale.client.name}
+                  </p>
+                  <p className="text-sm text-secondary-600">
+                    {sale.description}
+                  </p>
+                  <p className="text-xs text-secondary-500">
+                    {formatDate(sale.saleDate)}
+                  </p>
+                </div>
+                <p className="font-medium text-primary-600">
+                  {formatCurrency(Number(sale.value))}
                 </p>
               </div>
-              <p className="font-medium text-primary-600">
-                {formatCurrency(Number(sale.value))}
-              </p>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-secondary-600">Nenhuma venda recente</p>
+          )}
         </div>
       </div>
     </div>
