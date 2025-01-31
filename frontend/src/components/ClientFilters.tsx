@@ -32,8 +32,8 @@ export function ClientFilters({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-secondary-200">
-      <div className="flex items-center justify-between mb-2">
+    <div className="bg-white p-4 rounded-lg border border-secondary-200 relative">
+      <div className="absolute right-5 top-2">
         {search && (
           <ClearFiltersButton onClick={handleClear} disabled={isLoading} />
         )}
