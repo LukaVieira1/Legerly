@@ -1,36 +1,189 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ledgerly Frontend
 
-## Getting Started
+A modern web application built with Next.js 15 for managing store sales and payments.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 🔐 Authentication with JWT
+- 📊 Dashboard with metrics
+- 👥 Client management
+- 💰 Sales control
+- 💵 Payment tracking
+- 📱 Responsive design
+- 🎨 Modern UI with Tailwind CSS
+- ✨ Smooth animations with Framer Motion
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 15
+- **Styling:** Tailwind CSS
+- **State Management:** React Context + Hooks
+- **Forms:** React Hook Form + Zod
+- **HTTP Client:** Axios
+- **UI Components:** Headless UI
+- **Animations:** Framer Motion
+- **Icons:** React Icons
+- **Notifications:** React Toastify
+
+## 🚦 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- Yarn package manager
+- Backend API running (see [backend README](../backend/README.md))
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone [repository-url]
+   cd [repository-name]/frontend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   yarn install
+   ```
+
+3. Create environment file:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. Update environment variables:
+
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5050 # or your backend URL
+   ```
+
+5. Start development server:
+   ```bash
+   yarn dev
+   ```
+
+The application will be available at `http://localhost:3000`
+
+## 📁 Project Structure
+
+```
+frontend/
+├── src/
+│   ├── app/                 # App Router pages
+│   ├── components/          # Reusable components
+│   ├── hooks/              # Custom hooks
+│   ├── providers/          # Context providers
+│   ├── services/           # API services
+│   ├── types/              # TypeScript types
+│   └── utils/              # Utility functions
+├── public/                 # Static files
+└── tailwind.config.ts     # Tailwind configuration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔑 Authentication
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Default test users:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+Owner:
+  Email: owner@example.com
+  Password: owner123
 
-## Learn More
+Manager:
+  Email: manager@example.com
+  Password: manager123
 
-To learn more about Next.js, take a look at the following resources:
+Employee:
+  Email: employee@example.com
+  Password: employee123
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎯 Available Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Development
+yarn dev          # Start development server
 
-## Deploy on Vercel
+# Production
+yarn build        # Build for production
+yarn start        # Start production server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Linting
+yarn lint         # Run ESLint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔍 Common Issues
+
+### API Connection
+
+```bash
+# Error: Cannot connect to API
+# Solution: Check if backend is running
+# Verify NEXT_PUBLIC_API_URL in .env.local
+```
+
+### Build Errors
+
+```bash
+# Error: Build fails
+# Solution: Clear next cache
+rm -rf .next
+yarn build
+
+# If error persists:
+rm -rf node_modules
+yarn install
+yarn build
+```
+
+### Authentication Issues
+
+```bash
+# Error: Cannot login
+# Solution:
+# 1. Check if credentials are correct
+# 2. Verify if backend is running
+# 3. Clear browser cookies
+```
+
+## 📱 Responsive Design
+
+The application is fully responsive and optimized for:
+
+- 📱 Mobile devices
+- 💻 Tablets
+- 🖥️ Desktop computers
+
+## 🎨 UI Components
+
+Built with custom components using:
+
+- Tailwind CSS for styling
+- Headless UI for accessibility
+- Framer Motion for animations
+- React Icons for iconography
+
+## 🔄 State Management
+
+Uses React Context for:
+
+- User authentication
+- Client management
+- Sales control
+- Theme preferences
+
+## 📈 Performance
+
+Optimized with:
+
+- Route prefetching
+- Image optimization
+- Code splitting
+- Dynamic imports
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
