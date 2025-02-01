@@ -1,17 +1,54 @@
 # Changelog
 
+## 2025-01-21, v0.3.0
+
+### Added
+
+- Frontend application with Next.js 15
+  - Modern UI with Tailwind CSS
+  - Authentication system
+  - Dashboard layout
+  - Client management
+  - Sales management
+  - Payment tracking
+  - Responsive design
+- Project branding
+  - Custom SVG logo
+  - Favicon
+  - Color scheme
+- Documentation improvements
+  - Comprehensive README
+  - Frontend setup guide
+  - Project structure documentation
+  - Development workflow
+- Environment configuration
+  - Docker setup for full-stack
+  - Environment variables management
+  - Development scripts
+
+### Changed
+
+- Documentation organization
+- Development workflow
+- Environment setup process
+
 ## 2025-01-20, v0.2.0
 
 ### Added
 
-- client routes
-- user routes
-- store routes
-- sale routes
-- payment routes
-- postman collection
-- auth routes
-- readme improvements
+- Backend API routes
+  - Client routes
+  - User routes
+  - Store routes
+  - Sale routes
+  - Payment routes
+- Authentication system
+  - JWT implementation
+  - Role-based access control
+- API Documentation
+  - Postman collection
+  - README improvements
+  - API endpoints documentation
 
 ## 2025-01-19, v0.1.0
 
