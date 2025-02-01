@@ -91,7 +91,7 @@ export function StoreMetrics({ metrics }: StoreMetricsProps) {
               </div>
             ))
           ) : (
-            <p className="text-secondary-600">Nenhuma venda recente</p>
+            <p className="text-secondary-600">Nenhuma venda encontrada</p>
           )}
         </div>
       </div>
