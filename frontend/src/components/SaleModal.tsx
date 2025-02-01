@@ -44,7 +44,7 @@ interface SaleModalProps {
 }
 
 export function SaleModal({ isOpen, onClose, onAddSale }: SaleModalProps) {
-  const { clients } = useClientContext();
+  const { clients, handleSearch, isSearching } = useClientContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
@@ -154,10 +154,12 @@ export function SaleModal({ isOpen, onClose, onAddSale }: SaleModalProps) {
                         placeholder="Selecione um cliente"
                         icon={<UserIcon className="w-4 h-4" />}
                         error={errors.clientId}
+                        onSearchChange={handleSearch}
                         options={clients.map((client) => ({
                           value: client.id.toString(),
                           label: client.name,
                         }))}
+                        isLoading={isSearching}
                         {...field}
                       />
                     )}
