@@ -46,10 +46,19 @@ export class SaleController {
                 email: true,
               },
             },
+            payments: true,
           },
         });
 
-        if (!saleData.isPaid) {
+        if (saleData.isPaid) {
+          await tx.payment.create({
+            data: {
+              value: saleData.value,
+              payDate: new Date(),
+              saleId: sale.id,
+            },
+          });
+        } else {
           await tx.client.update({
             where: { id: saleData.clientId },
             data: {
@@ -60,14 +69,27 @@ export class SaleController {
           });
         }
 
-        return sale;
+        return await tx.sale.findUnique({
+          where: { id: sale.id },
+          include: {
+            client: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            payments: true,
+          },
+        });
       });
 
       return sale;
     } catch (error) {
       if (error instanceof z.ZodError) {
         return reply.status(400).send({
-          message: "Invalid input",
+          message: "Dados inválidos",
           errors: error.errors,
         });
       }
@@ -123,25 +145,46 @@ export class SaleController {
 
   async delete(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const { role, storeId } = request.user;
-
-      if (!["OWNER", "MANAGER"].includes(role)) {
-        return reply.status(403).send({ message: "Insufficient permissions" });
-      }
-
-      const { id } = z.object({ id: z.string() }).parse(request.params);
+      const { storeId } = request.user;
+      const { id } = request.params as { id: string };
 
       const sale = await prisma.sale.findUnique({
         where: { id: Number(id) },
+        include: {
+          payments: true,
+          client: true,
+        },
       });
 
       if (!sale || sale.storeId !== storeId) {
         return reply.status(404).send({ message: "Sale not found" });
       }
 
-      await prisma.sale.delete({
-        where: { id: Number(id) },
-      });
+      const totalPaid = sale.payments.reduce(
+        (sum, payment) => sum + Number(payment.value),
+        0
+      );
+
+      const debitToRemove = Number(sale.value) - totalPaid;
+
+      await prisma.$transaction([
+        prisma.client.update({
+          where: { id: sale.clientId },
+          data: {
+            debitBalance: {
+              decrement: debitToRemove,
+            },
+          },
+        }),
+
+        prisma.payment.deleteMany({
+          where: { saleId: Number(id) },
+        }),
+
+        prisma.sale.delete({
+          where: { id: Number(id) },
+        }),
+      ]);
 
       return reply.status(204).send();
     } catch (error) {
@@ -149,25 +192,113 @@ export class SaleController {
     }
   }
 
-  async list(request: FastifyRequest) {
-    const { storeId } = request.user;
+  async list(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const { storeId } = request.user;
+      const query = request.query as any;
 
-    const sales = await prisma.sale.findMany({
-      where: { storeId },
-      include: {
-        client: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+      const page = Number(query.page) || 1;
+      const limit = Number(query.limit) || 10;
+      const { search, isPaid, startDate, endDate } = query;
+
+      const where = {
+        storeId,
+        ...(search && {
+          OR: [
+            { description: { contains: search, mode: "insensitive" as const } },
+            {
+              client: {
+                name: { contains: search, mode: "insensitive" as const },
+              },
+            },
+          ],
+        }),
+        ...(isPaid !== undefined && { isPaid: isPaid === "true" }),
+        ...(startDate &&
+          endDate && {
+            saleDate: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+          }),
+      };
+
+      request.log.info({ where, page, limit }, "Listing sales");
+
+      const [sales, total] = await prisma.$transaction([
+        prisma.sale.findMany({
+          where,
+          include: {
+            client: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            payments: true,
+          },
+          orderBy: { saleDate: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.sale.count({ where }),
+      ]);
+
+      return {
+        sales,
+        pagination: {
+          total,
+          pages: Math.ceil(total / limit),
+          currentPage: page,
+          perPage: limit,
+        },
+      };
+    } catch (error) {
+      request.log.error(error, "Error listing sales");
+      return reply.status(500).send({ message: "Internal server error" });
+    }
+  }
+
+  async listById(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const { storeId } = request.user;
+      const { id } = z.object({ id: z.string() }).parse(request.params);
+
+      const sale = await prisma.sale.findUnique({
+        where: { id: Number(id) },
+        include: {
+          client: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          payments: {
+            select: {
+              id: true,
+              value: true,
+              payDate: true,
+              createdAt: true,
+            },
+            orderBy: {
+              payDate: "desc",
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+      });
 
-    return sales;
+      if (!sale || sale.storeId !== storeId) {
+        return reply.status(404).send({ message: "Sale not found" });
+      }
+
+      return sale;
+    } catch (error) {
+      return reply.status(500).send({ message: "Internal server error" });
+    }
   }
 
   async listByClient(request: FastifyRequest, reply: FastifyReply) {
@@ -197,6 +328,17 @@ export class SaleController {
               id: true,
               name: true,
               email: true,
+            },
+          },
+          payments: {
+            select: {
+              id: true,
+              value: true,
+              payDate: true,
+              createdAt: true,
+            },
+            orderBy: {
+              payDate: "desc",
             },
           },
         },

@@ -14,33 +14,90 @@ const updateStoreSchema = z.object({
 
 export class StoreController {
   async getMetrics(request: FastifyRequest) {
-    const { storeId } = request.user;
+    try {
+      const { storeId } = request.user;
+      const { startDate, endDate } = request.query as {
+        startDate?: string;
+        endDate?: string;
+      };
 
-    const [totalDebits, totalPayments] = await Promise.all([
-      prisma.client.aggregate({
-        where: { storeId },
-        _sum: {
-          debitBalance: true,
-        },
-      }),
+      const dateFilter = {
+        ...(startDate && {
+          gte: new Date(startDate),
+        }),
+        ...(endDate && {
+          lte: new Date(endDate),
+        }),
+      };
 
-      prisma.payment.aggregate({
-        where: {
-          sale: {
-            storeId,
-          },
-        },
-        _sum: {
-          value: true,
-        },
-      }),
-    ]);
+      const [totalDebits, totalPayments, topSales, totalClients] =
+        await Promise.all([
+          prisma.client.aggregate({
+            where: {
+              storeId,
+              debitBalance: { gt: 0 },
+            },
+            _sum: {
+              debitBalance: true,
+            },
+          }),
 
-    return {
-      totalDebits: totalDebits._sum.debitBalance || 0,
-      totalPayments: totalPayments._sum.value || 0,
-      updatedAt: new Date(),
-    };
+          prisma.payment.aggregate({
+            where: {
+              sale: {
+                storeId,
+                ...(Object.keys(dateFilter).length > 0 && {
+                  saleDate: dateFilter,
+                }),
+              },
+            },
+            _sum: {
+              value: true,
+            },
+          }),
+
+          prisma.sale.findMany({
+            where: {
+              storeId,
+              ...(Object.keys(dateFilter).length > 0 && {
+                saleDate: dateFilter,
+              }),
+            },
+            orderBy: {
+              value: "desc",
+            },
+            take: 5,
+            include: {
+              client: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          }),
+
+          prisma.client.count({
+            where: {
+              storeId,
+              debitBalance: { gt: 0 },
+            },
+          }),
+        ]);
+
+      return {
+        totalDebits: totalDebits._sum.debitBalance || 0,
+        totalPayments: totalPayments._sum.value || 0,
+        totalClientsWithDebit: totalClients,
+        topSales,
+        period: {
+          startDate: startDate || null,
+          endDate: endDate || null,
+        },
+      };
+    } catch (error) {
+      request.log.error(error, "Error getting store metrics");
+      throw error;
+    }
   }
 
   async getDetails(request: FastifyRequest, reply: FastifyReply) {

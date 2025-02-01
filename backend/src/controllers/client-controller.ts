@@ -52,7 +52,7 @@ export class ClientController {
     try {
       const { role, storeId } = request.user;
 
-      if (!["OWNER", "MANAGER"].includes(role)) {
+      if (!["OWNER", "MANAGER", "EMPLOYEE"].includes(role)) {
         return reply.status(403).send({ message: "Insufficient permissions" });
       }
 
@@ -89,14 +89,55 @@ export class ClientController {
   }
 
   async list(request: FastifyRequest) {
-    const { storeId } = request.user;
+    try {
+      const { storeId } = request.user;
+      const {
+        search = "",
+        page = "1",
+        limit = "10",
+      } = request.query as {
+        search?: string;
+        page?: string;
+        limit?: string;
+      };
 
-    const clients = await prisma.client.findMany({
-      where: { storeId },
-      orderBy: { name: "asc" },
-    });
+      const pageNumber = parseInt(page);
+      const limitNumber = parseInt(limit);
+      const skip = (pageNumber - 1) * limitNumber;
 
-    return clients;
+      const where = {
+        storeId,
+        ...(search && {
+          OR: [
+            { name: { contains: search, mode: "insensitive" as const } },
+            { phone: { contains: search } },
+          ],
+        }),
+      };
+
+      const [clients, total] = await Promise.all([
+        prisma.client.findMany({
+          where,
+          orderBy: { name: "asc" },
+          take: limitNumber,
+          skip,
+        }),
+        prisma.client.count({ where }),
+      ]);
+
+      return {
+        clients,
+        pagination: {
+          total,
+          pages: Math.ceil(total / limitNumber),
+          currentPage: pageNumber,
+          perPage: limitNumber,
+        },
+      };
+    } catch (error) {
+      request.log.error(error, "Error listing clients");
+      throw error;
+    }
   }
 
   async getById(request: FastifyRequest, reply: FastifyReply) {
@@ -186,6 +227,95 @@ export class ClientController {
       return reply.status(204).send();
     } catch (error) {
       return reply.status(500).send({ message: "Internal server error" });
+    }
+  }
+
+  async getClientMetrics(request: FastifyRequest) {
+    try {
+      const { storeId } = request.user;
+      const { id } = request.params as { id: string };
+      const { startDate, endDate } = request.query as {
+        startDate?: string;
+        endDate?: string;
+      };
+
+      const dateFilter = {
+        ...(startDate && {
+          gte: new Date(startDate),
+        }),
+        ...(endDate && {
+          lte: new Date(endDate),
+        }),
+      };
+
+      const [totalPayments, sales] = await Promise.all([
+        prisma.payment.aggregate({
+          where: {
+            sale: {
+              clientId: Number(id),
+              storeId,
+              ...(Object.keys(dateFilter).length > 0 && {
+                saleDate: dateFilter,
+              }),
+            },
+          },
+          _sum: {
+            value: true,
+          },
+        }),
+
+        prisma.sale.findMany({
+          where: {
+            clientId: Number(id),
+            storeId,
+            ...(Object.keys(dateFilter).length > 0 && {
+              saleDate: dateFilter,
+            }),
+          },
+          orderBy: {
+            saleDate: "desc",
+          },
+          include: {
+            payments: true,
+          },
+        }),
+      ]);
+
+      const client = await prisma.client.findUnique({
+        where: { id: Number(id) },
+        select: {
+          name: true,
+          debitBalance: true,
+        },
+      });
+
+      if (!client) {
+        throw new Error("Client not found");
+      }
+
+      return {
+        totalPayments: totalPayments._sum.value || 0,
+        debitBalance: client.debitBalance,
+        clientName: client.name,
+        sales: sales.map((sale) => ({
+          id: sale.id,
+          value: sale.value,
+          description: sale.description,
+          saleDate: sale.saleDate,
+          isPaid: sale.isPaid,
+          totalPaid: sale.payments.reduce(
+            (acc, payment) => acc + Number(payment.value),
+            0
+          ),
+        })),
+        period: {
+          startDate: startDate || null,
+          endDate: endDate || null,
+        },
+      };
+    } catch (error) {
+      request.log.error(error, "Error getting client metrics");
+      throw error;
     }
   }
 }

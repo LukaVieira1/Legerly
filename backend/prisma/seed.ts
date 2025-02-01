@@ -3,6 +3,72 @@ import { hashPassword } from "../src/helpers/utils";
 
 const prisma = new PrismaClient();
 
+const RANDOM_FIRST_NAMES = [
+  "Miguel",
+  "Sofia",
+  "Arthur",
+  "Helena",
+  "Bernardo",
+  "Valentina",
+  "Heitor",
+  "Laura",
+  "Davi",
+  "Isabella",
+  "Lorenzo",
+  "Manuela",
+  "Théo",
+  "Júlia",
+  "Pedro",
+  "Alice",
+  "Gabriel",
+  "Clara",
+  "Enzo",
+  "Luiza",
+  "Matheus",
+  "Beatriz",
+  "Lucas",
+  "Maria",
+  "Benjamin",
+  "Cecília",
+  "Nicolas",
+  "Eloá",
+  "Guilherme",
+  "Lara",
+  "Rafael",
+  "Mariana",
+  "Joaquim",
+  "Lívia",
+  "Samuel",
+  "Heloísa",
+  "Enzo",
+  "Maria",
+  "João",
+  "Melissa",
+];
+
+const RANDOM_LAST_NAMES = [
+  "Silva",
+  "Santos",
+  "Oliveira",
+  "Souza",
+  "Rodrigues",
+  "Ferreira",
+  "Alves",
+  "Pereira",
+  "Lima",
+  "Gomes",
+  "Costa",
+  "Ribeiro",
+  "Martins",
+  "Carvalho",
+  "Almeida",
+  "Lopes",
+  "Soares",
+  "Fernandes",
+  "Vieira",
+  "Barbosa",
+];
+
 async function main() {
   // Create initial store
   const store = await prisma.store.create({
@@ -68,70 +134,111 @@ async function main() {
     }),
   ]);
 
-  // Create some test clients
-  const clients = await Promise.all([
-    prisma.client.create({
-      data: {
-        name: "John Doe",
-        phone: "1234567890",
-        birthDate: new Date("1990-01-01"),
-        observations: "Regular customer",
-        storeId: store.id,
-        debitBalance: 150,
-      },
-    }),
-    prisma.client.create({
-      data: {
-        name: "Jane Smith",
-        phone: "0987654321",
-        birthDate: new Date("1985-05-15"),
-        observations: "Prefers evening appointments",
-        storeId: store.id,
-        debitBalance: 0,
-      },
-    }),
-  ]);
+  const clients = await Promise.all(
+    Array.from({ length: 20 }).map((_, index) => {
+      const firstName =
+        RANDOM_FIRST_NAMES[
+          Math.floor(Math.random() * RANDOM_FIRST_NAMES.length)
+        ];
+      const lastName =
+        RANDOM_LAST_NAMES[Math.floor(Math.random() * RANDOM_LAST_NAMES.length)];
+      const debitBalance =
+        Math.random() > 0.5 ? Math.floor(Math.random() * 1000) : 0;
 
-  // Create some sales and payments
-  const sale1 = await prisma.sale.create({
-    data: {
-      value: 150.0,
-      description: "Headset",
-      isPaid: false,
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      storeId: store.id,
-      clientId: clients[0].id,
-      userId: users[2].id, // Made by employee
-    },
-  });
-
-  const sale2 = await prisma.sale.create({
-    data: {
-      value: 200.0,
-      description: "Mouse",
-      isPaid: true,
-      dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-      storeId: store.id,
-      clientId: clients[1].id,
-      userId: users[1].id, // Made by manager
-      payments: {
-        create: {
-          value: 200.0,
-          payDate: new Date(),
+      return prisma.client.create({
+        data: {
+          name: `${firstName} ${lastName}`,
+          phone: `119${Math.floor(Math.random() * 100000000)}`,
+          birthDate: new Date(
+            1980 + Math.floor(Math.random() * 30),
+            Math.floor(Math.random() * 12),
+            Math.floor(Math.random() * 28) + 1
+          ),
+          observations:
+            Math.random() > 0.5 ? `Observação do cliente ${index + 1}` : null,
+          storeId: store.id,
+          debitBalance,
         },
-      },
-    },
-  });
+      });
+    })
+  );
+
+  const sales = await Promise.all(
+    Array.from({ length: 20 }).map(async (_, index) => {
+      const isPaid = Math.random() > 0.5;
+      const value = Math.floor(Math.random() * 1000) + 100;
+      const client = clients[Math.floor(Math.random() * clients.length)];
+      const user = users[Math.floor(Math.random() * users.length)];
+
+      const saleDate = new Date();
+      saleDate.setMonth(saleDate.getMonth() - Math.floor(Math.random() * 3));
+      saleDate.setDate(Math.floor(Math.random() * 28) + 1);
+
+      const dueDate = new Date(saleDate);
+      dueDate.setDate(dueDate.getDate() + Math.floor(Math.random() * 23) + 7);
+
+      const sale = await prisma.sale.create({
+        data: {
+          value,
+          description: `Venda ${index + 1} - Produto ${Math.floor(
+            Math.random() * 100
+          )}`,
+          isPaid,
+          saleDate,
+          dueDate,
+          storeId: store.id,
+          clientId: client.id,
+          userId: user.id,
+        },
+      });
+
+      if (isPaid) {
+        if (Math.random() < 0.7) {
+          await prisma.payment.create({
+            data: {
+              value,
+              payDate: new Date(
+                saleDate.getTime() +
+                  Math.random() * (new Date().getTime() - saleDate.getTime())
+              ),
+              saleId: sale.id,
+            },
+          });
+        } else {
+          const numberOfPayments = Math.floor(Math.random() * 2) + 2;
+          let remainingValue = value;
+
+          for (let i = 0; i < numberOfPayments; i++) {
+            const isLastPayment = i === numberOfPayments - 1;
+            const paymentValue = isLastPayment
+              ? remainingValue
+              : Math.floor(remainingValue / (numberOfPayments - i));
+
+            await prisma.payment.create({
+              data: {
+                value: paymentValue,
+                payDate: new Date(
+                  saleDate.getTime() + i * 15 * 24 * 60 * 60 * 1000
+                ),
+                saleId: sale.id,
+              },
+            });
+
+            remainingValue -= paymentValue;
+          }
+        }
+      }
+
+      return sale;
+    })
+  );
 
   console.log("Seed completed successfully!");
   console.log({
     store: { id: store.id, name: store.name },
-    users: users.map((u) => ({ id: u.id, email: u.email, name: u.name })),
+    users: users.map((u) => ({ id: u.id, email: u.email })),
     clients: clients.map((c) => ({ id: c.id, name: c.name })),
-    sales: [
-      { id: sale1.id, value: sale1.value, isPaid: sale1.isPaid },
-      { id: sale2.id, value: sale2.value, isPaid: sale2.isPaid },
-    ],
+    sales: sales.map((s) => ({ id: s.id, value: s.value, isPaid: s.isPaid })),
   });
 }
 

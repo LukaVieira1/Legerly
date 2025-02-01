@@ -10,4 +10,5 @@ export async function clientRoutes(app: FastifyInstance) {
   app.get("/:id", clientController.getById);
   app.patch("/:id/observations", clientController.updateObservations);
   app.delete("/:id", clientController.delete);
+  app.get("/:id/metrics", clientController.getClientMetrics);
 }

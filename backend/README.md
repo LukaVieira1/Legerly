@@ -1,5 +1,16 @@
 # Backend Documentation
 
+This is the backend for the Ledgerly project. It is a simple API built with Fastify and Prisma to manage sales and payments for a store. Is possible to run it locally or in a Docker container.
+
+The main features are:
+
+- Authentication
+- Store management
+- User management
+- Client management
+- Sale management
+- Payment management
+
 ## 🚀 First Time Setup
 
 1. Clone the repository and navigate to the backend directory:
@@ -257,6 +268,7 @@ backend/
 - `DELETE /clients/:id` - Delete client (requires OWNER/MANAGER)
 - `PATCH /clients/:id/debit-balance` - Update debit balance
 - `PATCH /clients/:id/observations` - Update observations
+- `GET /clients/:id/metrics` - Get client metrics
 
 ### 💰 Sales
 
@@ -265,6 +277,7 @@ backend/
 - `PUT /sales/:id` - Update sale (requires OWNER/MANAGER)
 - `DELETE /sales/:id` - Delete sale (requires OWNER/MANAGER)
 - `GET /sales/client/:clientId` - List sales by client
+- `GET /sales/:id` - List sales by id
 
 ### 💵 Payments
 
