@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Ledgerly Logo](frontend/public/logo.png)
+![Ledgerly Logo](frontend/public/logo.svg)
 
 A modern full-stack application for managing store sales and payments.
 
