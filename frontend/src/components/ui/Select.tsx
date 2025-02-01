@@ -2,6 +2,7 @@ import { forwardRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FieldError } from "react-hook-form";
 import { ChevronDownIcon, SearchIcon } from "@/components/Icons";
+import { SelectSkeleton } from "../skeletons/SelectSkeleton";
 
 interface SelectProps {
   label: string;
@@ -13,6 +14,8 @@ interface SelectProps {
   onChange?: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  onSearchChange?: (value: string) => void;
+  isLoading?: boolean;
 }
 
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(
@@ -26,6 +29,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       onChange,
       placeholder = "Selecione uma opção",
       disabled,
+      onSearchChange,
+      isLoading = false,
     },
     ref
   ) => {
@@ -43,8 +48,9 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
         onChange?.(value);
         setIsOpen(false);
         setSearch("");
+        onSearchChange?.(value);
       },
-      [onChange]
+      [onChange, onSearchChange]
     );
 
     return (
@@ -106,7 +112,10 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
                   <input
                     type="text"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      onSearchChange?.(e.target.value);
+                    }}
                     placeholder="Pesquisar..."
                     className="w-full pl-9 pr-4 py-2 text-sm border border-secondary-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                   />
@@ -114,7 +123,9 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               </div>
 
               <div className="max-h-60 overflow-auto">
-                {filteredOptions.length === 0 ? (
+                {isLoading ? (
+                  <SelectSkeleton />
+                ) : filteredOptions.length === 0 ? (
                   <div className="px-4 py-3 text-sm text-secondary-500">
                     Nenhum resultado encontrado
                   </div>
