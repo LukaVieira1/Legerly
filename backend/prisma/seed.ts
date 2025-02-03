@@ -71,26 +71,61 @@ async function main() {
     },
   });
 
-  // Create owner user
+  // Create users with different roles
   const hashedPassword = await hash("123456", 8);
-  const owner = await prisma.user.create({
-    data: {
-      name: "John Doe",
-      email: "john@demo.com",
-      password: hashedPassword,
-      stores: {
-        create: {
-          storeId: store.id,
-          role: "OWNER",
+
+  const [owner, manager, employee] = await Promise.all([
+    // Owner
+    prisma.user.create({
+      data: {
+        name: "John Doe",
+        email: "john@demo.com",
+        password: hashedPassword,
+        stores: {
+          create: {
+            storeId: store.id,
+            role: "OWNER",
+          },
         },
       },
-    },
-  });
+    }),
+    // Manager
+    prisma.user.create({
+      data: {
+        name: "Jane Smith",
+        email: "jane@demo.com",
+        password: hashedPassword,
+        stores: {
+          create: {
+            storeId: store.id,
+            role: "MANAGER",
+          },
+        },
+      },
+    }),
+    // Employee
+    prisma.user.create({
+      data: {
+        name: "Bob Wilson",
+        email: "bob@demo.com",
+        password: hashedPassword,
+        stores: {
+          create: {
+            storeId: store.id,
+            role: "EMPLOYEE",
+          },
+        },
+      },
+    }),
+  ]);
+
+  const users = [owner, manager, employee];
 
   // Create 20 clients
   const clients = await Promise.all(
-    Array.from({ length: 20 }).map((_, index) => {
-      const firstName = FIRST_NAMES[index];
+    Array.from({ length: 20 }).map((_) => {
+      const firstName =
+        FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
       const lastName =
         LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
 
@@ -114,9 +149,10 @@ async function main() {
     })
   );
 
-  // Create 30 sales with random distribution among clients
+  // Create 30 sales with random distribution among clients and users
   for (let i = 0; i < 30; i++) {
     const client = clients[Math.floor(Math.random() * clients.length)];
+    const user = users[Math.floor(Math.random() * users.length)];
     const saleValue = Math.floor(Math.random() * 900) + 100; // Random value between 100 and 1000
     const isPaid = Math.random() > 0.4; // 60% chance of being paid
     const paymentValue = isPaid
@@ -141,7 +177,7 @@ async function main() {
         dueDate: new Date(saleDate.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days after sale
         storeId: store.id,
         clientId: client.id,
-        userId: owner.id,
+        userId: user.id,
       },
     });
 
