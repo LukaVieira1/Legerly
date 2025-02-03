@@ -1,5 +1,6 @@
 {
   "name": "backend",
+  "version": "0.1.0",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -7,6 +8,7 @@
     "start": "node dist/server.js",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
+    "docker:seed": "docker-compose exec -e RUN_SEED=true backend yarn db:seed",
     "db:migrate-dev": "prisma migrate dev --name",
     "db:migrate-prod": "prisma migrate deploy",
     "studio": "prisma studio"
