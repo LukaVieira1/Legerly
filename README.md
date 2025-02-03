@@ -78,27 +78,36 @@ Employee:
    cd ledgerly
    ```
 
-2. Start the backend (you can see the backend documentation [here](backend/README.md)):
+2. Run the Docker build and seed the database, necessary for the initial setup.
 
    ```bash
-   cd backend
-   yarn install
-   docker-compose up -d
-   docker-compose exec -e RUN_SEED=true backend yarn db:seed
+   yarn docker:build  # Builds the Docker image for the project
+   yarn seed          # Populates the database with initial data
    ```
 
-3. Start the frontend (you can see the frontend documentation [here](frontend/README.md)):
+3. If you have problem with node modules, you can run the following command to install them.
 
    ```bash
-   cd frontend
-   yarn install
-   yarn dev
+   yarn install # Install the backend and frontend dependencies
    ```
 
 4. Access the application:
+
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5050
    - Prisma Studio: http://localhost:5555
+
+5. For the next time you just need to run the following command to start the project.
+
+   ```bash
+   yarn docker:up
+   ```
+
+6. If you want to stop the project, you can run the following command.
+
+   ```bash
+   yarn docker:down
+   ```
 
 ## 📚 Documentation
 
@@ -114,6 +123,14 @@ Employee:
   - State management
   - Routing
   - Styling
+
+## 🛠️ Useful Commands
+
+- `yarn docker:build` - Builds the Docker image for the project.
+- `yarn seed` - Populates the database with initial data.
+- `yarn docker:up` - Starts the Docker container for the project.
+- `yarn docker:down` - Stops the Docker container for the project.
+- `yarn install` - Installs the project dependencies.
 
 ## 🎯 Project Structure
 
