@@ -96,15 +96,14 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    if (initialLoading) return;
     const timer = setTimeout(() => {
-      if (!initialLoading) {
-        fetchFilteredSales(1);
-      }
+      fetchFilteredSales(1);
     }, 300);
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, initialLoading]);
+  }, [filters]);
 
   const handleAddPayment = async (value: number, saleId: number) => {
     try {
