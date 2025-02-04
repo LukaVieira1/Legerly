@@ -45,7 +45,6 @@ export function ClientFilters({
         placeholder="Nome ou telefone..."
         value={search}
         onChange={(e) => handleSearch(e.target.value)}
-        disabled={isLoading}
       />
     </div>
   );
