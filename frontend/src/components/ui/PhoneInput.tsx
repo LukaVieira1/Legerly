@@ -32,6 +32,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         value={value ? maskPhone(value.toString()) : ""}
         onChange={handleChange}
         maxLength={15}
+        type="tel"
         {...props}
       />
     );
