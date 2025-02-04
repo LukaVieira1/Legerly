@@ -72,15 +72,14 @@ async function main() {
   });
 
   // Create users with different roles
-  const hashedPassword = await hash("123456", 8);
 
   const [owner, manager, employee] = await Promise.all([
     // Owner
     prisma.user.create({
       data: {
-        name: "John Doe",
-        email: "john@demo.com",
-        password: hashedPassword,
+        name: "Owner",
+        email: "owner@example.com",
+        password: await hash("owner123", 8),
         stores: {
           create: {
             storeId: store.id,
@@ -92,9 +91,9 @@ async function main() {
     // Manager
     prisma.user.create({
       data: {
-        name: "Jane Smith",
-        email: "jane@demo.com",
-        password: hashedPassword,
+        name: "Manager",
+        email: "manager@example.com",
+        password: await hash("manager123", 8),
         stores: {
           create: {
             storeId: store.id,
@@ -106,9 +105,9 @@ async function main() {
     // Employee
     prisma.user.create({
       data: {
-        name: "Bob Wilson",
-        email: "bob@demo.com",
-        password: hashedPassword,
+        name: "Employee",
+        email: "employee@example.com",
+        password: await hash("employee123", 8),
         stores: {
           create: {
             storeId: store.id,
