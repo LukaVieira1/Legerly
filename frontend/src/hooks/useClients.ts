@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { IClient, IClientForm } from "@/types/client";
 import {
   getClients as getClientsService,
@@ -54,10 +54,12 @@ export function useClients() {
   };
 
   const debouncedFetch = useDebounce(fetchDebouncedClients, 500);
+  const previousSearchRef = useRef<string>("");
 
   useEffect(() => {
-    if (filters.search) {
+    if (filters.search || previousSearchRef.current !== "") {
       debouncedFetch();
+      previousSearchRef.current = filters.search;
     } else {
       fetchInitialClients();
     }
