@@ -36,7 +36,9 @@ export function StoreMetrics({ metrics }: StoreMetricsProps) {
 
         <div className="bg-white p-6 rounded-lg border border-secondary-200">
           <div className="flex items-center space-x-4">
-            <DollarIcon className="w-6 h-6 text-success-600" />
+            <div className="bg-success-50 p-3 rounded-full">
+              <DollarIcon className="w-6 h-6 text-success-600" />
+            </div>
             <div>
               <p className="text-sm font-medium text-secondary-600">
                 Total em Pagamentos
@@ -50,7 +52,9 @@ export function StoreMetrics({ metrics }: StoreMetricsProps) {
 
         <div className="bg-white p-6 rounded-lg border border-secondary-200">
           <div className="flex items-center space-x-4">
-            <UsersIcon className="w-6 h-6 text-primary-600" />
+            <div className="bg-primary-50 p-3 rounded-full">
+              <UsersIcon className="w-6 h-6 text-primary-600" />
+            </div>
             <div>
               <p className="text-sm font-medium text-secondary-600">
                 Clientes com Débito

@@ -96,15 +96,14 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    if (initialLoading) return;
     const timer = setTimeout(() => {
-      if (!initialLoading) {
-        fetchFilteredSales(1);
-      }
+      fetchFilteredSales(1);
     }, 300);
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, initialLoading]);
+  }, [filters]);
 
   const handleAddPayment = async (value: number, saleId: number) => {
     try {
@@ -128,7 +127,6 @@ export default function Dashboard() {
 
   const handleAddSale = async (sale: ISaleForm) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const newSale = await createSale(sale);
       setSales([newSale, ...(sales || [])]);
       setIsModalOpen(false);

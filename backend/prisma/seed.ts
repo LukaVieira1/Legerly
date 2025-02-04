@@ -1,245 +1,213 @@
 import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "../src/helpers/utils";
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const RANDOM_FIRST_NAMES = [
-  "Miguel",
-  "Sofia",
-  "Arthur",
-  "Helena",
-  "Bernardo",
-  "Valentina",
-  "Heitor",
-  "Laura",
-  "Davi",
-  "Isabella",
-  "Lorenzo",
-  "Manuela",
-  "Théo",
-  "Júlia",
-  "Pedro",
+const FIRST_NAMES = [
   "Alice",
-  "Gabriel",
-  "Clara",
-  "Enzo",
-  "Luiza",
-  "Matheus",
-  "Beatriz",
+  "Bob",
+  "Carol",
+  "David",
+  "Emma",
+  "Frank",
+  "Grace",
+  "Henry",
+  "Isabel",
+  "John",
+  "Kate",
   "Lucas",
   "Maria",
-  "Benjamin",
-  "Cecília",
-  "Nicolas",
-  "Eloá",
-  "Guilherme",
-  "Lara",
-  "Rafael",
-  "Mariana",
-  "Joaquim",
-  "Lívia",
-  "Samuel",
-  "Heloísa",
-  "Enzo",
-  "Maria",
-  "João",
-  "Melissa",
+  "Noah",
+  "Olivia",
+  "Peter",
+  "Quinn",
+  "Rachel",
+  "Sam",
+  "Thomas",
 ];
 
-const RANDOM_LAST_NAMES = [
-  "Silva",
-  "Santos",
-  "Oliveira",
-  "Souza",
-  "Rodrigues",
-  "Ferreira",
-  "Alves",
-  "Pereira",
-  "Lima",
-  "Gomes",
-  "Costa",
-  "Ribeiro",
-  "Martins",
-  "Carvalho",
-  "Almeida",
-  "Lopes",
-  "Soares",
-  "Fernandes",
-  "Vieira",
-  "Barbosa",
+const LAST_NAMES = [
+  "Smith",
+  "Johnson",
+  "Williams",
+  "Brown",
+  "Jones",
+  "Garcia",
+  "Miller",
+  "Davis",
+  "Rodriguez",
+  "Martinez",
+  "Hernandez",
+  "Lopez",
+  "Gonzalez",
+  "Wilson",
+  "Anderson",
+  "Thomas",
+  "Taylor",
+  "Moore",
+  "Jackson",
+  "Martin",
+];
+
+const SALE_DESCRIPTIONS = [
+  "Electronics Purchase",
+  "Home Appliances",
+  "Furniture Set",
+  "Kitchen Equipment",
+  "Office Supplies",
+  "Sporting Goods",
+  "Fashion Items",
+  "Beauty Products",
+  "Books and Stationery",
+  "Tools and Hardware",
 ];
 
 async function main() {
-  // Create initial store
+  // Create store
   const store = await prisma.store.create({
     data: {
-      name: "Example Store",
+      name: "Demo Store",
       image: "https://picsum.photos/200",
     },
   });
 
   // Create users with different roles
-  const users = await Promise.all([
-    // Owner user
+
+  const [owner, manager, employee] = await Promise.all([
+    // Owner
     prisma.user.create({
       data: {
-        name: "Store Owner",
+        name: "Owner",
         email: "owner@example.com",
-        password: await hashPassword("owner123"),
+        password: await hash("owner123", 8),
+        stores: {
+          create: {
+            storeId: store.id,
+            role: "OWNER",
+          },
+        },
       },
     }),
-    // Manager user
+    // Manager
     prisma.user.create({
       data: {
-        name: "Store Manager",
+        name: "Manager",
         email: "manager@example.com",
-        password: await hashPassword("manager123"),
+        password: await hash("manager123", 8),
+        stores: {
+          create: {
+            storeId: store.id,
+            role: "MANAGER",
+          },
+        },
       },
     }),
-    // Employee user
+    // Employee
     prisma.user.create({
       data: {
-        name: "Store Employee",
+        name: "Employee",
         email: "employee@example.com",
-        password: await hashPassword("employee123"),
+        password: await hash("employee123", 8),
+        stores: {
+          create: {
+            storeId: store.id,
+            role: "EMPLOYEE",
+          },
+        },
       },
     }),
   ]);
 
-  // Link users to store with different roles
-  await Promise.all([
-    // Link owner
-    prisma.userStore.create({
-      data: {
-        userId: users[0].id,
-        storeId: store.id,
-        role: "OWNER",
-      },
-    }),
-    // Link manager
-    prisma.userStore.create({
-      data: {
-        userId: users[1].id,
-        storeId: store.id,
-        role: "MANAGER",
-      },
-    }),
-    // Link employee
-    prisma.userStore.create({
-      data: {
-        userId: users[2].id,
-        storeId: store.id,
-        role: "EMPLOYEE",
-      },
-    }),
-  ]);
+  const users = [owner, manager, employee];
 
+  // Create 20 clients
   const clients = await Promise.all(
-    Array.from({ length: 20 }).map((_, index) => {
+    Array.from({ length: 20 }).map((_) => {
       const firstName =
-        RANDOM_FIRST_NAMES[
-          Math.floor(Math.random() * RANDOM_FIRST_NAMES.length)
-        ];
+        FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
       const lastName =
-        RANDOM_LAST_NAMES[Math.floor(Math.random() * RANDOM_LAST_NAMES.length)];
-      const debitBalance =
-        Math.random() > 0.5 ? Math.floor(Math.random() * 1000) : 0;
+        LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
 
       return prisma.client.create({
         data: {
           name: `${firstName} ${lastName}`,
-          phone: `119${Math.floor(Math.random() * 100000000)}`,
+          phone: `119${Math.floor(Math.random() * 90000000 + 10000000)}`,
           birthDate: new Date(
-            1980 + Math.floor(Math.random() * 30),
+            1970 + Math.floor(Math.random() * 40),
             Math.floor(Math.random() * 12),
             Math.floor(Math.random() * 28) + 1
           ),
           observations:
-            Math.random() > 0.5 ? `Observação do cliente ${index + 1}` : null,
+            Math.random() > 0.5
+              ? `Regular customer since ${2020 + Math.floor(Math.random() * 4)}`
+              : null,
           storeId: store.id,
-          debitBalance,
+          debitBalance: 0, // Initialize with zero, will be updated after sales
         },
       });
     })
   );
 
-  const sales = await Promise.all(
-    Array.from({ length: 20 }).map(async (_, index) => {
-      const isPaid = Math.random() > 0.5;
-      const value = Math.floor(Math.random() * 1000) + 100;
-      const client = clients[Math.floor(Math.random() * clients.length)];
-      const user = users[Math.floor(Math.random() * users.length)];
+  // Create 30 sales with random distribution among clients and users
+  for (let i = 0; i < 30; i++) {
+    const client = clients[Math.floor(Math.random() * clients.length)];
+    const user = users[Math.floor(Math.random() * users.length)];
+    const saleValue = Math.floor(Math.random() * 900) + 100; // Random value between 100 and 1000
+    const isPaid = Math.random() > 0.4; // 60% chance of being paid
+    const paymentValue = isPaid
+      ? saleValue
+      : Math.floor(saleValue * Math.random());
 
-      const saleDate = new Date();
-      saleDate.setMonth(saleDate.getMonth() - Math.floor(Math.random() * 3));
-      saleDate.setDate(Math.floor(Math.random() * 28) + 1);
+    // Create sale with random past date (up to 3 months ago)
+    const saleDate = new Date();
+    saleDate.setMonth(saleDate.getMonth() - Math.floor(Math.random() * 3));
+    saleDate.setDate(Math.floor(Math.random() * 28) + 1);
 
-      const dueDate = new Date(saleDate);
-      dueDate.setDate(dueDate.getDate() + Math.floor(Math.random() * 23) + 7);
+    const sale = await prisma.sale.create({
+      data: {
+        value: saleValue,
+        description: `${
+          SALE_DESCRIPTIONS[
+            Math.floor(Math.random() * SALE_DESCRIPTIONS.length)
+          ]
+        } #${i + 1}`,
+        isPaid,
+        saleDate,
+        dueDate: new Date(saleDate.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days after sale
+        storeId: store.id,
+        clientId: client.id,
+        userId: user.id,
+      },
+    });
 
-      const sale = await prisma.sale.create({
+    if (paymentValue > 0) {
+      await prisma.payment.create({
         data: {
-          value,
-          description: `Venda ${index + 1} - Produto ${Math.floor(
-            Math.random() * 100
-          )}`,
-          isPaid,
-          saleDate,
-          dueDate,
-          storeId: store.id,
-          clientId: client.id,
-          userId: user.id,
+          value: paymentValue,
+          payDate: new Date(
+            saleDate.getTime() +
+              Math.random() * (new Date().getTime() - saleDate.getTime())
+          ),
+          saleId: sale.id,
         },
       });
+    }
 
-      if (isPaid) {
-        if (Math.random() < 0.7) {
-          await prisma.payment.create({
-            data: {
-              value,
-              payDate: new Date(
-                saleDate.getTime() +
-                  Math.random() * (new Date().getTime() - saleDate.getTime())
-              ),
-              saleId: sale.id,
-            },
-          });
-        } else {
-          const numberOfPayments = Math.floor(Math.random() * 2) + 2;
-          let remainingValue = value;
-
-          for (let i = 0; i < numberOfPayments; i++) {
-            const isLastPayment = i === numberOfPayments - 1;
-            const paymentValue = isLastPayment
-              ? remainingValue
-              : Math.floor(remainingValue / (numberOfPayments - i));
-
-            await prisma.payment.create({
-              data: {
-                value: paymentValue,
-                payDate: new Date(
-                  saleDate.getTime() + i * 15 * 24 * 60 * 60 * 1000
-                ),
-                saleId: sale.id,
-              },
-            });
-
-            remainingValue -= paymentValue;
-          }
-        }
-      }
-
-      return sale;
-    })
-  );
+    // Update client's debit balance
+    const remainingValue = saleValue - paymentValue;
+    if (remainingValue > 0) {
+      await prisma.client.update({
+        where: { id: client.id },
+        data: {
+          debitBalance: {
+            increment: remainingValue,
+          },
+        },
+      });
+    }
+  }
 
   console.log("Seed completed successfully!");
-  console.log({
-    store: { id: store.id, name: store.name },
-    users: users.map((u) => ({ id: u.id, email: u.email })),
-    clients: clients.map((c) => ({ id: c.id, name: c.name })),
-    sales: sales.map((s) => ({ id: s.id, value: s.value, isPaid: s.isPaid })),
-  });
 }
 
 main()

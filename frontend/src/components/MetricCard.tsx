@@ -1,3 +1,5 @@
+import { formatCurrency } from "@/utils/format";
+
 interface MetricCardProps {
   title: string;
   metrics: number;
@@ -12,7 +14,7 @@ export function MetricCard({ title, metrics, icon }: MetricCardProps) {
         <div>
           <p className="text-sm font-medium text-secondary-600">{title}</p>
           <p className="text-2xl font-semibold text-secondary-900">
-            R$ {metrics.toFixed(2)}
+            {formatCurrency(metrics)}
           </p>
         </div>
       </div>

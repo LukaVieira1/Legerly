@@ -1,5 +1,19 @@
 # Changelog
 
+## 2025-02-04, v0.3.1
+
+### Fixed
+
+- Frontend container
+- Seed data
+- Numeric keyboard in client phone input
+- Duplicate request for sale list
+- Unfocused input in client search
+- Currency format in sale page
+- App icon
+- Remove delay in requests, used to show loading
+- Scripts to start backend and frontend
+
 ## 2025-01-21, v0.3.0
 
 ### Added
