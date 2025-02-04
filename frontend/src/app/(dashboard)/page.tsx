@@ -127,7 +127,6 @@ export default function Dashboard() {
 
   const handleAddSale = async (sale: ISaleForm) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const newSale = await createSale(sale);
       setSales([newSale, ...(sales || [])]);
       setIsModalOpen(false);
