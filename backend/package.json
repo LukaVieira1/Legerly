@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "npx prisma migrate deploy && npx prisma db seed && node dist/server.js",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "docker:seed": "docker-compose exec -e RUN_SEED=true backend yarn db:seed",
