@@ -32,13 +32,10 @@ model User {
 
 model UserStore {
   id        Int      @id @default(autoincrement())
-  role      Role     @default(EMPLOYEE)
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
   storeId   Int
+  role      UserRole
+  user      User     @relation(fields: [userId], references: [id])
   store     Store    @relation(fields: [storeId], references: [id])
 
   @@unique([userId, storeId])
@@ -90,7 +87,8 @@ model Payment {
   sale      Sale     @relation(fields: [saleId], references: [id])
 }
 
-enum Role {
+enum UserRole {
+  ADMIN
   OWNER
   MANAGER
   EMPLOYEE

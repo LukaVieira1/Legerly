@@ -134,10 +134,10 @@ export class StoreController {
     try {
       const { role, id: userId } = request.user;
 
-      if (role !== "OWNER") {
+      if (!["ADMIN", "OWNER"].includes(role)) {
         return reply
           .status(403)
-          .send({ message: "Only owners can create stores" });
+          .send({ message: "Only admins and owners can create stores" });
       }
 
       const storeData = createStoreSchema.parse(request.body);
@@ -147,14 +147,12 @@ export class StoreController {
           data: {
             name: storeData.name,
             image: storeData.image,
-          },
-        });
-
-        await tx.userStore.create({
-          data: {
-            userId,
-            storeId: store.id,
-            role: "OWNER",
+            users: {
+              create: {
+                userId: Number(userId),
+                role: role === "ADMIN" ? "ADMIN" : "OWNER",
+              },
+            },
           },
         });
 

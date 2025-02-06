@@ -6,6 +6,7 @@ import { authenticate } from "../middlewares/auth";
 import { paymentRoutes } from "./payment.routes";
 import { storeRoutes } from "./store.routes";
 import { userRoutes } from "./user.routes";
+import { UserController } from "../controllers/user-controller";
 
 export default async function appRoutes(app: FastifyInstance) {
   // Decorate the request with user
@@ -18,6 +19,11 @@ export default async function appRoutes(app: FastifyInstance) {
 
   // Public authentication routes
   app.register(authRoutes, { prefix: "/auth" });
+
+  app.post("/users/super", async (request, reply) => {
+    const userController = new UserController();
+    return userController.createSuperUser(request, reply);
+  });
 
   // Protected routes
   app.register(async function (protectedRoutes) {
