@@ -30,6 +30,7 @@ services:
       NODE_ENV: development
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/legerly?schema=public
       RUN_SEED: "false"
+      SUPER_USER_SECRET: "123456"
     depends_on:
       postgres:
         condition: service_healthy
