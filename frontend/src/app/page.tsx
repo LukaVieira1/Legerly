@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import Dashboard from "./_dashboard/page";
 
 export default function Home() {
-  return redirect("/dashboard");
+  return <Dashboard />;
 }
