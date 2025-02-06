@@ -1,5 +1,15 @@
 # Changelog
 
+## 2025-02-06, v0.3.2
+
+### Fixed
+
+- Cannot create store if user is not admin
+- Cannot create user if user is not admin
+  - Super user, created because of the need to create the first store and admin user
+  - Super user is created with a secret key, which is stored in the .env file
+- Start script, which runs migrations, seeds and starts the server
+
 ## 2025-02-04, v0.3.1
 
 ### Fixed
