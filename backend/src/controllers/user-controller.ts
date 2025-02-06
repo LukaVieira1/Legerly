@@ -6,7 +6,8 @@ const createUserSchema = z.object({
   name: z.string().min(3),
   email: z.string().email(),
   password: z.string().min(6),
-  role: z.enum(["MANAGER", "EMPLOYEE"]),
+  role: z.enum(["OWNER", "MANAGER", "EMPLOYEE"]),
+  storeId: z.number(),
 });
 
 const updateUserSchema = z.object({
@@ -14,16 +15,18 @@ const updateUserSchema = z.object({
   email: z.string().email().optional(),
   password: z.string().min(6).optional(),
   role: z.enum(["MANAGER", "EMPLOYEE"]).optional(),
+  storeId: z.number().optional(),
 });
 
 export class UserController {
   async create(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const { role: currentUserRole, storeId } = request.user;
+      const { role: currentUserRole, storeId: currentUserStoreId } =
+        request.user;
 
-      if (!["OWNER", "MANAGER"].includes(currentUserRole)) {
+      if (!["ADMIN", "OWNER", "MANAGER"].includes(currentUserRole)) {
         return reply.status(403).send({
-          message: "Only owners and managers can create users",
+          message: "Only admins, owners and managers can create users",
         });
       }
 
@@ -35,10 +38,34 @@ export class UserController {
         });
       }
 
+      if (currentUserRole !== "ADMIN") {
+        if (userData.data.storeId !== currentUserStoreId) {
+          return reply.status(403).send({
+            message: "You can only create users for your own store",
+          });
+        }
+      }
+
+      const store = await prisma.store.findUnique({
+        where: { id: userData.data.storeId },
+      });
+
+      if (!store) {
+        return reply.status(400).send({ message: "Store not found" });
+      }
+
       if (currentUserRole === "MANAGER") {
         if (userData.data.role !== "EMPLOYEE") {
           return reply.status(403).send({
             message: "Managers can only create employees",
+          });
+        }
+      }
+
+      if (currentUserRole === "OWNER") {
+        if (!["MANAGER", "EMPLOYEE"].includes(userData.data.role)) {
+          return reply.status(403).send({
+            message: "Owners can only create managers and employees",
           });
         }
       }
@@ -63,8 +90,20 @@ export class UserController {
         await tx.userStore.create({
           data: {
             userId: user.id,
-            storeId,
+            storeId: userData.data.storeId,
             role: userData.data.role,
+          },
+        });
+
+        await tx.store.create({
+          data: {
+            name: "Default Store",
+            users: {
+              create: {
+                userId: user.id,
+                role: "ADMIN",
+              },
+            },
           },
         });
 
@@ -290,6 +329,71 @@ export class UserController {
       return reply.status(204).send();
     } catch (error) {
       return reply.status(500).send({ message: "Internal server error" });
+    }
+  }
+
+  async createSuperUser(request: FastifyRequest, reply: FastifyReply) {
+    const createSuperUserBody = z.object({
+      name: z.string(),
+      email: z.string().email(),
+      password: z.string(),
+      secretKey: z.string(),
+    });
+
+    try {
+      const { name, email, password, secretKey } = createSuperUserBody.parse(
+        request.body
+      );
+
+      const envSecretKey = process.env.SUPER_USER_SECRET;
+      if (!envSecretKey || secretKey !== envSecretKey) {
+        return reply.status(403).send({
+          error: "Invalid secret key",
+        });
+      }
+
+      const userExists = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (userExists) {
+        return reply.status(400).send({ error: "User already exists" });
+      }
+
+      const hashedPassword = await hashPassword(password);
+
+      const user = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+          data: {
+            name,
+            email,
+            password: hashedPassword,
+          },
+        });
+
+        await tx.store.create({
+          data: {
+            name: "Default Store",
+            users: {
+              create: {
+                userId: user.id,
+                role: "ADMIN",
+              },
+            },
+          },
+        });
+
+        return user;
+      });
+
+      return reply.status(201).send({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: "ADMIN",
+      });
+    } catch (error) {
+      return reply.status(500).send({ error: "Internal server error" });
     }
   }
 }
