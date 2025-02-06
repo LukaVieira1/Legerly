@@ -7,14 +7,15 @@ app = 'ledgerly'
 primary_region = 'gru'
 
 [build]
+  command = "npx prisma migrate deploy && npx prisma db seed" 
 
 [http_service]
   internal_port = 5050
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = false 
   auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+  min_machines_running = 1
+  processes = ["app"]
 
 [[vm]]
   memory = '1gb'
