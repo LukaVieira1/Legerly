@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for ledgerly on 2025-02-06T11:42:15Z
+# fly.toml app configuration file generated for ledgerly on 2025-02-06T12:18:31Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -20,4 +20,4 @@ primary_region = 'gru'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
-  memory_mb = 256
+  memory_mb = 1024
